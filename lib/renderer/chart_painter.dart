@@ -1,7 +1,7 @@
 import 'dart:async' show StreamSink;
 
 import 'package:flutter/material.dart';
-import 'package:k_chart/utils/number_util.dart';
+import 'package:trade_chart/utils/number_util.dart';
 
 import '../entity/info_window_entity.dart';
 import '../entity/k_line_entity.dart';
