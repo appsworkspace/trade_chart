@@ -45,8 +45,8 @@ class ChartColors {
   Color infoWindowUpColor = Color(0xff00ff00);
   Color infoWindowDnColor = Color(0xffff0000);
 
-  Color hCrossColor = Color(0xffffffff);
-  Color vCrossColor = Color(0x1Effffff);
+  Color hCrossColor = Color(0xff4c5c74);
+  Color vCrossColor = Color(0xff4c5c74);
   Color crossTextColor = Color(0xffffffff);
 
   //当前显示内最大和最小值的颜色

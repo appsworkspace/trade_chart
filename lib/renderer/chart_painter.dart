@@ -169,6 +169,7 @@ class ChartPainter extends BaseChartPainter {
           lastPoint, curPoint, lastX, curX, size, canvas);
     }
 
+    if (isLongPress == true) drawCrossLine(canvas, size);
     canvas.restore();
   }
 
@@ -379,7 +380,7 @@ class ChartPainter extends BaseChartPainter {
     var index = calculateSelectedX(selectX);
     KLineEntity point = getItem(index);
     Paint paintY = Paint()
-      ..color = this.chartColors.vCrossColor
+      ..color = Colors.white12
       ..strokeWidth = this.chartStyle.vCrossWidth
       ..isAntiAlias = true;
     double x = getX(index);
@@ -389,7 +390,7 @@ class ChartPainter extends BaseChartPainter {
         Offset(x, size.height - mBottomPadding), paintY);
 
     Paint paintX = Paint()
-      ..color = this.chartColors.hCrossColor
+      ..color = Colors.white
       ..strokeWidth = this.chartStyle.hCrossWidth
       ..isAntiAlias = true;
     // k线图横线
