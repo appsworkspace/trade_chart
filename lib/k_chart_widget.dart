@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:trade_chart/chart_translations.dart';
 import 'package:trade_chart/extension/map_ext.dart';
-import 'package:trade_chart/flutter_trade_chart.dart';
+import 'package:trade_chart/flutter_k_chart.dart';
 
 enum MainState { MA, BOLL, NONE }
 enum SecondaryState { MACD, KDJ, RSI, WR, CCI, NONE }
