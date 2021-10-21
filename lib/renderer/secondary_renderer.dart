@@ -43,8 +43,6 @@ class SecondaryRenderer extends BaseChartRenderer<MACDEntity> {
             this.chartColors.kColor);
         drawLine(lastPoint.d, curPoint.d, canvas, lastX, curX,
             this.chartColors.dColor);
-        drawLine(lastPoint.j, curPoint.j, canvas, lastX, curX,
-            this.chartColors.jColor);
         break;
       case SecondaryState.RSI:
         drawLine(lastPoint.rsi, curPoint.rsi, canvas, lastX, curX,
@@ -65,67 +63,142 @@ class SecondaryRenderer extends BaseChartRenderer<MACDEntity> {
 
   void drawMACD(MACDEntity curPoint, Canvas canvas, double curX,
       MACDEntity lastPoint, double lastX) {
-    final macd = curPoint.macd ?? 0;
+    final macd = curPoint.k ?? 0;
     double macdY = getY(macd);
+
+    final macd2 = curPoint.d ?? 0;
+    double macdY2 = getY(macd2);
+
     double r = mMACDWidth / 2;
     double zeroy = getY(0);
-    if (macd > 0) {
+
+    if (macd >= 70) {
       canvas.drawRect(Rect.fromLTRB(curX - r, macdY, curX + r, zeroy),
-          chartPaint..color = this.chartColors.upColor);
-    } else {
-      canvas.drawRect(Rect.fromLTRB(curX - r, zeroy, curX + r, macdY),
-          chartPaint..color = this.chartColors.dnColor);
+          chartPaint..color = this.chartColors.overbought);
+    } else if (macd >= 60) {
+      canvas.drawRect(Rect.fromLTRB(curX - r, macdY, curX + r, zeroy),
+          chartPaint..color = this.chartColors.strongbuy);
+    }else if (macd >= 50) {
+      canvas.drawRect(Rect.fromLTRB(curX - r, macdY, curX + r, zeroy),
+          chartPaint..color = this.chartColors.buy);
+    } else if (macd == 50) {
+      canvas.drawRect(Rect.fromLTRB(curX - r, macdY, curX + r, zeroy),
+          chartPaint..color = this.chartColors.netral);
+    } else if (macd < 50) {
+      canvas.drawRect(Rect.fromLTRB(curX - r, macdY, curX + r, zeroy),
+          chartPaint..color = this.chartColors.sell);
+    } else if (macd <= 40) {
+      canvas.drawRect(Rect.fromLTRB(curX - r, macdY, curX + r, zeroy),
+          chartPaint..color = this.chartColors.strongsell);
+    } else if (macd <= 30) {
+      canvas.drawRect(Rect.fromLTRB(curX - r, macdY, curX + r, zeroy),
+          chartPaint..color = this.chartColors.oversold);
     }
-    if (lastPoint.dif != 0) {
-      drawLine(lastPoint.dif, curPoint.dif, canvas, lastX, curX,
-          this.chartColors.difColor);
+
+        if (macd2 >= 80) {
+      canvas.drawRect(Rect.fromLTRB(curX - r, macdY2, curX + r, zeroy),
+          chartPaint..color = this.chartColors.overbought);
+    } else if (macd2 >= 65) {
+      canvas.drawRect(Rect.fromLTRB(curX - r, macdY2, curX + r, zeroy),
+          chartPaint..color = this.chartColors.strongbuy);
+    }else if (macd2 >= 50) {
+      canvas.drawRect(Rect.fromLTRB(curX - r, macdY2, curX + r, zeroy),
+          chartPaint..color = this.chartColors.buy);
+    } else if (macd2 == 50) {
+      canvas.drawRect(Rect.fromLTRB(curX - r, macdY2, curX + r, zeroy),
+          chartPaint..color = this.chartColors.netral);
+    } else if (macd2 < 50) {
+      canvas.drawRect(Rect.fromLTRB(curX - r, macdY2, curX + r, zeroy),
+          chartPaint..color = this.chartColors.sell);
+    } else if (macd2 <= 35) {
+      canvas.drawRect(Rect.fromLTRB(curX - r, macdY2, curX + r, zeroy),
+          chartPaint..color = this.chartColors.strongsell);
+    } else if (macd2 <= 20) {
+      canvas.drawRect(Rect.fromLTRB(curX - r, macdY2, curX + r, zeroy),
+          chartPaint..color = this.chartColors.oversold);
     }
-    if (lastPoint.dea != 0) {
-      drawLine(lastPoint.dea, curPoint.dea, canvas, lastX, curX,
-          this.chartColors.deaColor);
-    }
+    // if (lastPoint.k != 0) {
+    //   drawLine(lastPoint.k, curPoint.k, canvas, lastX, curX,
+    //       this.chartColors.kColor);
+    // }
+    // if (lastPoint.d != 0) {
+    //   drawLine(lastPoint.d, curPoint.d, canvas, lastX, curX,
+    //       this.chartColors.dColor);
+    // }
   }
 
   @override
   void drawText(Canvas canvas, MACDEntity data, double x) {
+    final macd = data.k ?? 0;
+    final macd2 = data.d ?? 0;
     List<TextSpan>? children;
     switch (state) {
       case SecondaryState.MACD:
         children = [
-          TextSpan(
-              text: "MACD(12,26,9)    ",
-              style: getTextStyle(this.chartColors.defaultTextColor)),
-          if (data.macd != 0)
-            TextSpan(
-                text: "MACD:${format(data.macd)}    ",
-                style: getTextStyle(this.chartColors.macdColor)),
-          if (data.dif != 0)
-            TextSpan(
-                text: "DIF:${format(data.dif)}    ",
-                style: getTextStyle(this.chartColors.difColor)),
-          if (data.dea != 0)
-            TextSpan(
-                text: "DEA:${format(data.dea)}    ",
-                style: getTextStyle(this.chartColors.deaColor)),
+
+TextSpan(
+                text: 
+                macd >= 70 ? "RSI (${format(macd)}) : OVERBOUGHT    "
+                : macd >= 60 ? "RSI (${format(macd)}) : STRONG BUY    "
+                : macd >= 50 ? "RSI (${format(macd)}) : BUY    "
+                : macd == 50 ? "RSI (${format(macd)}) : NETRAL   "
+                : macd < 50 ? "RSI (${format(macd)}) : SELL    "
+                : macd <= 40 ? "RSI (${format(macd)}) : STRONG SELL    "
+                : macd <= 30 ? "RSI (${format(macd)}) : OVER SOLD   "
+                : "-   ",
+                style: macd >= 70 ? getTextStyle(this.chartColors.overbought)
+                : macd >= 60 ? getTextStyle(this.chartColors.strongbuy)
+                : macd >= 50 ? getTextStyle(this.chartColors.buy)
+                : macd == 50 ? getTextStyle(this.chartColors.netral)
+                : macd < 50 ? getTextStyle(this.chartColors.sell)
+                : macd <= 40 ? getTextStyle(this.chartColors.strongsell)
+                : macd <= 30 ? getTextStyle(this.chartColors.oversold)
+                : getTextStyle(this.chartColors.netral)
+),
+
+TextSpan(
+                text: 
+                macd2 >= 80 ? "MFI (${format(macd2)}) : OVERBOUGHT    "
+                : macd2 >= 65 ? "MFI (${format(macd2)}) : STRONG BUY    "
+                : macd2 >= 50 ? "MFI (${format(macd2)}) : BUY    "
+                : macd2 == 50 ? "MFI (${format(macd2)}) : NETRAL   "
+                : macd2 < 50 ? "MFI (${format(macd2)}) : SELL    "
+                : macd2 <= 35 ? "MFI (${format(macd2)}) : STRONG SELL    "
+                : macd2 <= 20 ? "MFI (${format(macd2)}) : OVER SOLD   "
+                : "-   ",
+                style: macd2 >= 80 ? getTextStyle(this.chartColors.overbought)
+                : macd2 >= 65 ? getTextStyle(this.chartColors.strongbuy)
+                : macd2 >= 50 ? getTextStyle(this.chartColors.buy)
+                : macd2 == 50 ? getTextStyle(this.chartColors.netral)
+                : macd2 < 50 ? getTextStyle(this.chartColors.sell)
+                : macd2 <= 35 ? getTextStyle(this.chartColors.strongsell)
+                : macd2 <= 20 ? getTextStyle(this.chartColors.oversold)
+                : getTextStyle(this.chartColors.netral)
+),
+     
+    
         ];
         break;
       case SecondaryState.KDJ:
         children = [
           TextSpan(
-              text: "KDJ(9,1,3)    ",
-              style: getTextStyle(this.chartColors.defaultTextColor)),
-          if (data.macd != 0)
-            TextSpan(
-                text: "K:${format(data.k)}    ",
+                text: "RSI:${format(data.k)}    ",
                 style: getTextStyle(this.chartColors.kColor)),
-          if (data.dif != 0)
-            TextSpan(
-                text: "D:${format(data.d)}    ",
-                style: getTextStyle(this.chartColors.dColor)),
-          if (data.dea != 0)
-            TextSpan(
-                text: "J:${format(data.j)}    ",
-                style: getTextStyle(this.chartColors.jColor)),
+          TextSpan(
+                text: "MFI:${format(data.d)}    ",
+                style: getTextStyle(this.chartColors.dColor)),      
+          // if (data.macd != 0)
+          //   TextSpan(
+          //       text: "K:${format(data.k)}    ",
+          //       style: getTextStyle(this.chartColors.kColor)),
+          // if (data.dif != 0)
+          //   TextSpan(
+          //       text: "D:${format(data.d)}    ",
+          //       style: getTextStyle(this.chartColors.dColor)),
+          // if (data.dea != 0)
+          //   TextSpan(
+          //       text: "J:${format(data.j)}    ",
+          //       style: getTextStyle(this.chartColors.jColor)),
         ];
         break;
       case SecondaryState.RSI:

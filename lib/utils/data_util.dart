@@ -142,22 +142,24 @@ class DataUtil {
 
   static void calcRSI(List<KLineEntity> dataList) {
     double? rsi;
-    double rsiABSEma = 0;
-    double rsiMaxEma = 0;
+    // double rsiABSEma = 0;
+    // double rsiMaxEma = 0;
     for (int i = 0; i < dataList.length; i++) {
       KLineEntity entity = dataList[i];
-      final double closePrice = entity.close;
+      // final double closePrice = entity.close;
+      final double closePrice = entity.datarsi;
       if (i == 0) {
         rsi = 0;
-        rsiABSEma = 0;
-        rsiMaxEma = 0;
+        // rsiABSEma = 0;
+        // rsiMaxEma = 0;
       } else {
-        double Rmax = max(0, closePrice - dataList[i - 1].close.toDouble());
-        double RAbs = (closePrice - dataList[i - 1].close.toDouble()).abs();
+        // double Rmax = max(0, closePrice - dataList[i - 1].close.toDouble());
+        // double RAbs = (closePrice - dataList[i - 1].close.toDouble()).abs();
 
-        rsiMaxEma = (Rmax + (14 - 1) * rsiMaxEma) / 14;
-        rsiABSEma = (RAbs + (14 - 1) * rsiABSEma) / 14;
-        rsi = (rsiMaxEma / rsiABSEma) * 100;
+        // rsiMaxEma = (Rmax + (14 - 1) * rsiMaxEma) / 14;
+        // rsiABSEma = (RAbs + (14 - 1) * rsiABSEma) / 14;
+        // rsi = (rsiMaxEma / rsiABSEma) * 100;
+        rsi = closePrice;
       }
       if (i < 13) rsi = null;
       if (rsi != null && rsi.isNaN) rsi = null;
@@ -166,37 +168,39 @@ class DataUtil {
   }
 
   static void calcKDJ(List<KLineEntity> dataList) {
-    var preK = 50.0;
-    var preD = 50.0;
-    final tmp = dataList.first;
-    tmp.k = preK;
-    tmp.d = preD;
-    tmp.j = 50.0;
+    // var preK = 50.0;
+    // var preD = 50.0;
+    // final tmp = dataList.first;
+    // tmp.k = preK;
+    // tmp.d = preD;
+    // tmp.j = 50.0;
     for (int i = 1; i < dataList.length; i++) {
       final entity = dataList[i];
-      final n = max(0, i - 8);
-      var low = entity.low;
-      var high = entity.high;
-      for (int j = n; j < i; j++) {
-        final t = dataList[j];
-        if (t.low < low) {
-          low = t.low;
-        }
-        if (t.high > high) {
-          high = t.high;
-        }
-      }
-      final cur = entity.close;
-      var rsv = (cur - low) * 100.0 / (high - low);
-      rsv = rsv.isNaN ? 0 : rsv;
-      final k = (2 * preK + rsv) / 3.0;
-      final d = (2 * preD + k)/ 3.0;
-      final j = 3 * k - 2 * d;
-      preK = k;
-      preD = d;
-      entity.k = k;
-      entity.d = d;
-      entity.j = j;
+      final double closePrice = entity.datarsi;
+      final double closePrice2 = entity.mfi;
+      // final n = max(0, i - 8);
+      // var low = entity.low;
+      // var high = entity.high;
+      // for (int j = n; j < i; j++) {
+      //   final t = dataList[j];
+      //   if (t.low < low) {
+      //     low = t.low;
+      //   }
+      //   if (t.high > high) {
+      //     high = t.high;
+      //   }
+      // }
+      // final cur = entity.close;
+      // var rsv = (cur - low) * 100.0 / (high - low);
+      // rsv = rsv.isNaN ? 0 : rsv;
+      // final k = (2 * preK + rsv) / 3.0;
+      // final d = (2 * preD + k)/ 3.0;
+      // final j = 3 * k - 2 * d;
+      // preK = k;
+      // preD = d;
+      entity.k = closePrice;
+      entity.d = closePrice2;
+      entity.j = closePrice;
     }
   }
 

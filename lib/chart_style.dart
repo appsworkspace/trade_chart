@@ -1,7 +1,14 @@
 import 'package:flutter/material.dart' show Color;
 
 class ChartColors {
-  List<Color> bgColor = [Color(0xff18191d), Color(0xff18191d)];
+
+  Color overbought = Color(0xff205072);
+  Color strongbuy = Color(0xff329D9C);
+  Color buy = Color(0xff56C596);
+  Color netral = Color(0xff808080);
+  Color sell = Color(0xffFD8F52);
+  Color strongsell = Color(0xffFE676E);
+  Color oversold = Color(0xffC73866);
 
   Color kLineColor = Color(0xff4C86CD);
   Color lineFillColor = Color(0x554C86CD);
@@ -23,14 +30,11 @@ class ChartColors {
 
   Color defaultTextColor = Color(0xff60738E);
 
-  Color nowPriceUpColor = Color(0xff4DAA90);
-  Color nowPriceDnColor = Color(0xffC15466);
-  Color nowPriceTextColor = Color(0xffffffff);
+  Color nowPriceColor = Color(0xffC9B885);
 
   //深度颜色
   Color depthBuyColor = Color(0xff60A893);
   Color depthSellColor = Color(0xffC15866);
-
   //选中后显示值边框颜色
   Color selectBorderColor = Color(0xff6C7A86);
 
@@ -45,8 +49,8 @@ class ChartColors {
   Color infoWindowUpColor = Color(0xff00ff00);
   Color infoWindowDnColor = Color(0xffff0000);
 
-  Color hCrossColor = Color(0xff4c5c74);
-  Color vCrossColor = Color(0xff4c5c74);
+  Color hCrossColor = Color(0xffffffff);
+  Color vCrossColor = Color(0x1Effffff);
   Color crossTextColor = Color(0xffffffff);
 
   //当前显示内最大和最小值的颜色
@@ -54,24 +58,23 @@ class ChartColors {
   Color minColor = Color(0xffffffff);
 
   Color getMAColor(int index) {
+    Color maColor = ma5Color;
     switch (index % 3) {
+      case 0:
+        maColor = ma5Color;
+        break;
       case 1:
-        return ma10Color;
+        maColor = ma10Color;
+        break;
       case 2:
-        return ma30Color;
-      default:
-        return ma5Color;
+        maColor = ma30Color;
+        break;
     }
+    return maColor;
   }
 }
 
 class ChartStyle {
-  double topPadding = 30.0;
-
-  double bottomPadding = 20.0;
-
-  double childPadding = 12.0;
-
   //点与点的距离
   double pointWidth = 11.0;
 
@@ -92,20 +95,4 @@ class ChartStyle {
 
   //水平交叉线宽度
   double hCrossWidth = 0.5;
-
-  //现在价格的线条长度
-  double nowPriceLineLength = 1;
-
-  //现在价格的线条间隔
-  double nowPriceLineSpan = 1;
-
-  //现在价格的线条粗细
-  double nowPriceLineWidth = 1;
-
-  int gridRows = 4;
-
-  int gridColumns = 4;
-
-  //下方時間客製化
-  List<String>? dateTimeFormat;
 }

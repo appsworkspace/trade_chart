@@ -1,6 +1,6 @@
 name: trade_chart
 description: A Flutter K Chart.
-version: 0.0.4
+version: 0.0.13
 homepage: https://github.com/appsworkspace/trade_chart
 
 environment:

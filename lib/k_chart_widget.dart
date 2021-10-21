@@ -33,15 +33,11 @@ class KChartWidget extends StatefulWidget {
   final bool hideGrid;
   @Deprecated('Use `translations` instead.')
   final bool isChinese;
-  final bool showNowPrice;
-  final bool showInfoDialog;
   final Map<String, ChartTranslations> translations;
   final List<String> timeFormat;
 
   //当屏幕滚动到尽头会调用，真为拉到屏幕右侧尽头，假为拉到屏幕左侧尽头
   final Function(bool)? onLoadMore;
-
-  @Deprecated('Use `chartColors` instead.')
   final List<Color>? bgColor;
   final int fixedLength;
   final List<int> maDayList;
@@ -62,13 +58,11 @@ class KChartWidget extends StatefulWidget {
     this.volHidden = false,
     this.isLine = false,
     this.hideGrid = false,
-    @Deprecated('Use `translations` instead.') this.isChinese = false,
-    this.showNowPrice = true,
-    this.showInfoDialog = true,
+    this.isChinese = false,
     this.translations = kChartTranslations,
     this.timeFormat = TimeFormat.YEAR_MONTH_DAY,
     this.onLoadMore,
-    @Deprecated('Use `chartColors` instead.') this.bgColor,
+    this.bgColor,
     this.fixedLength = 2,
     this.maDayList = const [5, 10, 20],
     this.flingTime = 600,
@@ -85,7 +79,7 @@ class _KChartWidgetState extends State<KChartWidget>
     with TickerProviderStateMixin {
   double mScaleX = 1.0, mScrollX = 0.0, mSelectX = 0.0;
   StreamController<InfoWindowEntity?>? mInfoWindowStream;
-  double mHeight = 0, mWidth = 0;
+  double mWidth = 0;
   AnimationController? _controller;
   Animation<double>? aniX;
 
@@ -105,6 +99,7 @@ class _KChartWidgetState extends State<KChartWidget>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    mWidth = MediaQuery.of(context).size.width;
   }
 
   @override
@@ -133,82 +128,73 @@ class _KChartWidgetState extends State<KChartWidget>
       secondaryState: widget.secondaryState,
       isLine: widget.isLine,
       hideGrid: widget.hideGrid,
-      showNowPrice: widget.showNowPrice,
       sink: mInfoWindowStream?.sink,
       bgColor: widget.bgColor,
       fixedLength: widget.fixedLength,
       maDayList: widget.maDayList,
     );
-
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        mHeight = constraints.maxHeight;
-        mWidth = constraints.maxWidth;
-
-        return GestureDetector(
-          onTapUp: (details) {
-            if (widget.onSecondaryTap != null &&
-                _painter.isInSecondaryRect(details.localPosition)) {
-              widget.onSecondaryTap!();
-            }
-          },
-          onHorizontalDragDown: (details) {
-            _stopAnimation();
-            _onDragChanged(true);
-          },
-          onHorizontalDragUpdate: (details) {
-            if (isScale || isLongPress) return;
-            mScrollX = ((details.primaryDelta ?? 0) / mScaleX + mScrollX)
-                .clamp(0.0, ChartPainter.maxScrollX)
-                .toDouble();
-            notifyChanged();
-          },
-          onHorizontalDragEnd: (DragEndDetails details) {
-            var velocity = details.velocity.pixelsPerSecond.dx;
-            _onFling(velocity);
-          },
-          onHorizontalDragCancel: () => _onDragChanged(false),
-          onScaleStart: (_) {
-            isScale = true;
-          },
-          onScaleUpdate: (details) {
-            if (isDrag || isLongPress) return;
-            mScaleX = (_lastScale * details.scale).clamp(0.5, 2.2);
-            notifyChanged();
-          },
-          onScaleEnd: (_) {
-            isScale = false;
-            _lastScale = mScaleX;
-          },
-          onLongPressStart: (details) {
-            isLongPress = true;
-            if (mSelectX != details.globalPosition.dx) {
-              mSelectX = details.globalPosition.dx;
-              notifyChanged();
-            }
-          },
-          onLongPressMoveUpdate: (details) {
-            if (mSelectX != details.globalPosition.dx) {
-              mSelectX = details.globalPosition.dx;
-              notifyChanged();
-            }
-          },
-          onLongPressEnd: (details) {
-            isLongPress = false;
-            mInfoWindowStream?.sink.add(null);
-            notifyChanged();
-          },
-          child: Stack(
-            children: <Widget>[
-              CustomPaint(
-                size: Size(double.infinity, double.infinity),
-                painter: _painter,
-              ),
-              if (widget.showInfoDialog) _buildInfoDialog()
-            ],
-          ),
-        );
+    return GestureDetector(
+      onTapUp: (details) {
+        if (widget.onSecondaryTap != null &&
+            _painter.isInSecondaryRect(details.localPosition)) {
+          widget.onSecondaryTap!();
+        }
       },
+      onHorizontalDragDown: (details) {
+        _stopAnimation();
+        _onDragChanged(true);
+      },
+      onHorizontalDragUpdate: (details) {
+        if (isScale || isLongPress) return;
+        mScrollX = (details.primaryDelta! / mScaleX + mScrollX)
+            .clamp(0.0, ChartPainter.maxScrollX)
+            .toDouble();
+        notifyChanged();
+      },
+      onHorizontalDragEnd: (DragEndDetails details) {
+        var velocity = details.velocity.pixelsPerSecond.dx;
+        _onFling(velocity);
+      },
+      onHorizontalDragCancel: () => _onDragChanged(false),
+      onScaleStart: (_) {
+        isScale = true;
+      },
+      onScaleUpdate: (details) {
+        if (isDrag || isLongPress) return;
+        mScaleX = (_lastScale * details.scale).clamp(0.5, 2.2);
+        notifyChanged();
+      },
+      onScaleEnd: (_) {
+        isScale = false;
+        _lastScale = mScaleX;
+      },
+      onLongPressStart: (details) {
+        isLongPress = true;
+        if (mSelectX != details.globalPosition.dx) {
+          mSelectX = details.globalPosition.dx;
+          notifyChanged();
+        }
+      },
+      onLongPressMoveUpdate: (details) {
+        if (mSelectX != details.globalPosition.dx) {
+          mSelectX = details.globalPosition.dx;
+          notifyChanged();
+        }
+      },
+      onLongPressEnd: (details) {
+        isLongPress = false;
+        mInfoWindowStream?.sink.add(null);
+        notifyChanged();
+      },
+      child: Stack(
+        children: <Widget>[
+          CustomPaint(
+            size: Size(double.infinity, double.infinity),
+            painter: _painter,
+          ),
+          _buildInfoDialog()
+        ],
+      ),
     );
   }
 
@@ -323,7 +309,8 @@ class _KChartWidgetState extends State<KChartWidget>
       color = widget.chartColors.infoWindowUpColor;
     else if (info.startsWith("-"))
       color = widget.chartColors.infoWindowDnColor;
-
+    else
+      color = widget.chartColors.infoWindowNormalColor;
     return Row(
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.center,
