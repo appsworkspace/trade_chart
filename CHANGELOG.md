@@ -49,3 +49,7 @@
 ## [0.0.13]
 
 * Bar MFI, RSI Signal
+
+## [0.0.14]
+
+* Fix Bugs

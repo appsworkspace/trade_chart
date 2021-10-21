@@ -1,6 +1,6 @@
 name: trade_chart
-description: A Flutter K Chart.
-version: 0.0.13
+description: A powerful Flutter chart library, currently supporting RSI Signal and MFI Signal.
+version: 0.0.14
 homepage: https://github.com/appsworkspace/trade_chart
 
 environment:
