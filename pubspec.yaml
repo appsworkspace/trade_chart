@@ -1,5 +1,5 @@
 name: trade_chart
-description: A powerful Flutter chart library, currently supporting RSI Signal and MFI Signal.
+description: Trade Chart is specifically used by PT. Mirae Asset Sekuritas Indonesia.
 version: 0.1.4
 homepage: https://github.com/appsworkspace/trade_chart
 
