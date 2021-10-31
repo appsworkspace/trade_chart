@@ -73,7 +73,6 @@ class _MyHomePageState extends State<MyHomePage> {
     _asks = [];
     double amount = 0.0;
     bids.sort((left, right) => left.price.compareTo(right.price));
-    //累加买入委托量
     bids.reversed.forEach((item) {
       amount += item.vol;
       item.vol = amount;
@@ -82,7 +81,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
     amount = 0.0;
     asks.sort((left, right) => left.price.compareTo(right.price));
-    //累加卖出委托量
     asks.forEach((item) {
       amount += item.vol;
       item.vol = amount;
@@ -112,7 +110,6 @@ class _MyHomePageState extends State<MyHomePage> {
               timeFormat: TimeFormat.YEAR_MONTH_DAY,
               translations: kChartTranslations,
               showNowPrice: _showNowPrice,
-              //`isChinese` is Deprecated, Use `translations` instead.
               isChinese: isChinese,
               hideGrid: _hideGrid,
               maDayList: [1, 100, 1000],
@@ -220,7 +217,6 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  //获取火币数据，需要翻墙
   Future<String> getIPAddress(String? period) async {
     var url =
         'https://api.huobi.br.com/market/history/kline?period=${period ?? '1day'}&size=300&symbol=btcusdt';

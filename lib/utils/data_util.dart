@@ -50,13 +50,13 @@ class DataUtil {
         double md = 0;
         for (int j = i - n + 1; j <= i; j++) {
           double c = dataList[j].close;
-          double m = entity.BOLLMA!;
+          double m = entity.MA!;
           double value = c - m;
           md += value * value;
         }
         md = md / (n - 1);
         md = sqrt(md);
-        entity.mb = entity.BOLLMA!;
+        entity.mb = entity.MA!;
         entity.up = entity.mb! + k * md;
         entity.dn = entity.mb! - k * md;
       }
@@ -65,16 +65,29 @@ class DataUtil {
 
   static void _calcBOLLMA(int day, List<KLineEntity> dataList) {
     double ma = 0;
+    double hma = 0;
+    double lma = 0;
     for (int i = 0; i < dataList.length; i++) {
       KLineEntity entity = dataList[i];
       ma += entity.close;
+      hma += entity.high;
+      lma += entity.low;
+
       if (i == day - 1) {
-        entity.BOLLMA = ma / day;
+        entity.MA = ma / day;
+        entity.hMA = hma / day;
+        entity.lMA = lma / day;
       } else if (i >= day) {
         ma -= dataList[i - day].close;
-        entity.BOLLMA = ma / day;
+        hma -= dataList[i - day].high;
+        lma -= dataList[i - day].low;
+        entity.MA = ma / day;
+        entity.hMA = hma / day;
+        entity.lMA = lma / day;
       } else {
-        entity.BOLLMA = null;
+        entity.MA = 0;
+        entity.hMA = 0;
+        entity.lMA = 0;
       }
     }
   }
@@ -113,12 +126,14 @@ class DataUtil {
   static void calcVolumeMA(List<KLineEntity> dataList) {
     double volumeMa5 = 0;
     double volumeMa10 = 0;
+    double volumeMa20 = 0;
 
     for (int i = 0; i < dataList.length; i++) {
       KLineEntity entry = dataList[i];
 
       volumeMa5 += entry.vol;
       volumeMa10 += entry.vol;
+      volumeMa20 += entry.vol;
 
       if (i == 4) {
         entry.MA5Volume = (volumeMa5 / 5);
@@ -137,70 +152,108 @@ class DataUtil {
       } else {
         entry.MA10Volume = 0;
       }
+
+      if (i == 19) {
+        entry.MA20Volume = volumeMa20 / 20;
+      } else if (i > 19) {
+        volumeMa20 -= dataList[i - 20].vol;
+        entry.MA20Volume = volumeMa20 / 20;
+      } else {
+        entry.MA20Volume = 0;
+      }
     }
   }
 
   static void calcRSI(List<KLineEntity> dataList) {
     double? rsi;
-    // double rsiABSEma = 0;
-    // double rsiMaxEma = 0;
+    double? signal;
+    double rsiABSEma = 0;
+    double rsiMaxEma = 0;
+
+    double rsiABSEma9 = 0;
+    double rsiMaxEma9 = 0;
+
     for (int i = 0; i < dataList.length; i++) {
       KLineEntity entity = dataList[i];
-      // final double closePrice = entity.close;
-      final double closePrice = entity.datarsi;
+
+      final double closePrice = entity.close;
       if (i == 0) {
         rsi = 0;
-        // rsiABSEma = 0;
-        // rsiMaxEma = 0;
+        signal = 0;
+        rsiABSEma = 0;
+        rsiMaxEma = 0;
+        rsiABSEma9 = 0;
+        rsiMaxEma9 = 0;
       } else {
-        // double Rmax = max(0, closePrice - dataList[i - 1].close.toDouble());
-        // double RAbs = (closePrice - dataList[i - 1].close.toDouble()).abs();
+        double Rmax = max(0, closePrice - dataList[i - 1].close.toDouble());
+        double RAbs = (closePrice - dataList[i - 1].close.toDouble()).abs();
 
-        // rsiMaxEma = (Rmax + (14 - 1) * rsiMaxEma) / 14;
-        // rsiABSEma = (RAbs + (14 - 1) * rsiABSEma) / 14;
-        // rsi = (rsiMaxEma / rsiABSEma) * 100;
-        rsi = closePrice;
+        rsiMaxEma = (Rmax + (14 - 1) * rsiMaxEma) / 14;
+        rsiABSEma = (RAbs + (14 - 1) * rsiABSEma) / 14;
+
+        rsiMaxEma9 = (Rmax + (9 - 1) * rsiMaxEma9) / 9;
+        rsiABSEma9 = (RAbs + (9 - 1) * rsiABSEma9) / 9;
+
+        rsi = (rsiMaxEma / rsiABSEma) * 100;
+        signal = ((rsiMaxEma9 / rsiABSEma9)) * 100;
       }
-      if (i < 13) rsi = null;
+      if (i < 8) rsi = null;
       if (rsi != null && rsi.isNaN) rsi = null;
       entity.rsi = rsi;
+      if (i < 13) signal = null;
+      if (signal != null && signal.isNaN) signal = null;
+      entity.signal = signal;
+    }
+  }
+
+    static void _calcRSIMA(int day, List<KLineEntity> dataList) {
+    double ma = 0;
+    for (int i = 0; i < dataList.length; i++) {
+      KLineEntity entity = dataList[i];
+      ma += entity.close;
+      if (i == day - 1) {
+        entity.signal = ma / day;
+      } else if (i >= day) {
+        ma -= dataList[i - day].close;
+        entity.signal = ma / day;
+      } else {
+        entity.signal = null;
+      }
     }
   }
 
   static void calcKDJ(List<KLineEntity> dataList) {
-    // var preK = 50.0;
-    // var preD = 50.0;
-    // final tmp = dataList.first;
-    // tmp.k = preK;
-    // tmp.d = preD;
-    // tmp.j = 50.0;
+    var preK = 50.0;
+    var preD = 50.0;
+    final tmp = dataList.first;
+    tmp.k = preK;
+    tmp.d = preD;
+    tmp.j = 50.0;
     for (int i = 1; i < dataList.length; i++) {
       final entity = dataList[i];
-      final double closePrice = entity.datarsi;
-      final double closePrice2 = entity.mfi;
-      // final n = max(0, i - 8);
-      // var low = entity.low;
-      // var high = entity.high;
-      // for (int j = n; j < i; j++) {
-      //   final t = dataList[j];
-      //   if (t.low < low) {
-      //     low = t.low;
-      //   }
-      //   if (t.high > high) {
-      //     high = t.high;
-      //   }
-      // }
-      // final cur = entity.close;
-      // var rsv = (cur - low) * 100.0 / (high - low);
-      // rsv = rsv.isNaN ? 0 : rsv;
-      // final k = (2 * preK + rsv) / 3.0;
-      // final d = (2 * preD + k)/ 3.0;
-      // final j = 3 * k - 2 * d;
-      // preK = k;
-      // preD = d;
-      entity.k = closePrice;
-      entity.d = closePrice2;
-      entity.j = closePrice;
+      final n = max(0, i - 8);
+      var low = entity.low;
+      var high = entity.high;
+      for (int j = n; j < i; j++) {
+        final t = dataList[j];
+        if (t.low < low) {
+          low = t.low;
+        }
+        if (t.high > high) {
+          high = t.high;
+        }
+      }
+      final cur = entity.close;
+      var rsv = (cur - low) * 100.0 / (high - low);
+      rsv = rsv.isNaN ? 0 : rsv;
+      final k = (2 * preK + rsv) / 3.0;
+      final d = (2 * preD + k)/ 3.0;
+      final j = 3 * k - 2 * d;
+      preK = k;
+      preD = d;
+      entity.k = k;
+      entity.d = d;
+      entity.j = j;
     }
   }
 

@@ -10,12 +10,13 @@ import 'base_chart_painter.dart';
 import 'base_chart_renderer.dart';
 import 'main_renderer.dart';
 import 'secondary_renderer.dart';
+import 'third_renderer.dart';
 import 'vol_renderer.dart';
 
 class ChartPainter extends BaseChartPainter {
   static get maxScrollX => BaseChartPainter.maxScrollX;
   late BaseChartRenderer mMainRenderer;
-  BaseChartRenderer? mVolRenderer, mSecondaryRenderer;
+  BaseChartRenderer? mVolRenderer, mSecondaryRenderer, mThirdRenderer;
   StreamSink<InfoWindowEntity?>? sink;
   Color? upColor, dnColor;
   Color? ma5Color, ma10Color, ma30Color;
@@ -40,6 +41,7 @@ class ChartPainter extends BaseChartPainter {
     mainState,
     volHidden,
     secondaryState,
+    thirdState,
     this.sink,
     bool isLine = false,
     this.hideGrid = false,
@@ -56,6 +58,7 @@ class ChartPainter extends BaseChartPainter {
             mainState: mainState,
             volHidden: volHidden,
             secondaryState: secondaryState,
+            thirdState: thirdState,
             isLine: isLine) {
     selectPointPaint = Paint()
       ..isAntiAlias = true
@@ -103,6 +106,17 @@ class ChartPainter extends BaseChartPainter {
           chartStyle,
           chartColors);
     }
+    if (mThirdRect != null) {
+      mThirdRenderer = ThirdRenderer(
+          mThirdRect!,
+          mThirdMaxValue,
+          mThirdMinValue,
+          mChildPadding,
+          thirdState,
+          fixedLength,
+          chartStyle,
+          chartColors);
+    }
   }
 
   @override
@@ -131,6 +145,14 @@ class ChartPainter extends BaseChartPainter {
       canvas.drawRect(secondaryRect,
           mBgPaint..shader = mBgGradient.createShader(secondaryRect));
     }
+
+    if (mThirdRect != null) {
+      Rect thirdRect = Rect.fromLTRB(0, mThirdRect!.top - mChildPadding,
+          mThirdRect!.width, mThirdRect!.bottom);
+      canvas.drawRect(thirdRect,
+          mBgPaint..shader = mBgGradient.createShader(thirdRect));
+    }
+    
     Rect dateRect =
         Rect.fromLTRB(0, size.height - mBottomPadding, size.width, size.height);
     canvas.drawRect(
@@ -143,6 +165,7 @@ class ChartPainter extends BaseChartPainter {
       mMainRenderer.drawGrid(canvas, mGridRows, mGridColumns);
       mVolRenderer?.drawGrid(canvas, mGridRows, mGridColumns);
       mSecondaryRenderer?.drawGrid(canvas, mGridRows, mGridColumns);
+      mThirdRenderer?.drawGrid(canvas, mGridRows, mGridColumns);
     }
   }
 
@@ -162,11 +185,14 @@ class ChartPainter extends BaseChartPainter {
       mVolRenderer?.drawChart(lastPoint, curPoint, lastX, curX, size, canvas);
       mSecondaryRenderer?.drawChart(
           lastPoint, curPoint, lastX, curX, size, canvas);
+      mThirdRenderer?.drawChart(
+          lastPoint, curPoint, lastX, curX, size, canvas);
     }
 
     if (isLongPress == true) drawCrossLine(canvas, size);
     canvas.restore();
   }
+  
 
   @override
   void drawRightText(canvas) {
@@ -174,6 +200,7 @@ class ChartPainter extends BaseChartPainter {
     mMainRenderer.drawRightText(canvas, textStyle, mGridRows);
     mVolRenderer?.drawRightText(canvas, textStyle, mGridRows);
     mSecondaryRenderer?.drawRightText(canvas, textStyle, mGridRows);
+    mThirdRenderer?.drawRightText(canvas, textStyle, mGridRows);
   }
 
   @override
@@ -285,6 +312,7 @@ class ChartPainter extends BaseChartPainter {
     mMainRenderer.drawText(canvas, data, x);
     mVolRenderer?.drawText(canvas, data, x);
     mSecondaryRenderer?.drawText(canvas, data, x);
+     mThirdRenderer?.drawText(canvas, data, x);
   }
 
   @override
@@ -391,5 +419,9 @@ class ChartPainter extends BaseChartPainter {
   /// 点是否在SecondaryRect中
   bool isInSecondaryRect(Offset point) {
     return mSecondaryRect?.contains(point) ?? false;
+  }
+
+  bool isInThirdRect(Offset point) {
+    return mThirdRect?.contains(point) ?? false;
   }
 }

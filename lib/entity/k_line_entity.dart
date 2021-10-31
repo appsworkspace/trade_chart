@@ -7,8 +7,6 @@ class KLineEntity extends KEntity {
   late double close;
   late double vol;
   late double amount;
-  late double datarsi;
-  late double mfi;
   double? change;
   double? ratio;
   int? time;
@@ -23,8 +21,6 @@ class KLineEntity extends KEntity {
     required this.high,
     required this.low,
     required this.vol,
-    required this.datarsi,
-    required this.mfi,
   });
 
   KLineEntity.fromJson(Map<String, dynamic> json) {
@@ -34,8 +30,6 @@ class KLineEntity extends KEntity {
     close = json['close']?.toDouble() ?? 0;
     vol = json['vol']?.toDouble() ?? 0;
     amount = json['amount']?.toDouble() ?? 0;
-    datarsi = json['rsi']?.toDouble() ?? 0;
-    mfi = json['mfi']?.toDouble() ?? 0;
     int? tempTime = json['time']?.toInt();
     //兼容火币数据
     if (tempTime == null) {
@@ -58,13 +52,11 @@ class KLineEntity extends KEntity {
     data['amount'] = this.amount;
     data['ratio'] = this.ratio;
     data['change'] = this.change;
-    data['rsi'] = this.datarsi;
-    data['mfi'] = this.mfi;
     return data;
   }
 
   @override
   String toString() {
-    return 'MarketModel{open: $open, high: $high, low: $low, close: $close, vol: $vol, time: $time, amount: $amount, ratio: $ratio, change: $change, datarsi: $datarsi, mfi: $mfi}';
+    return 'MarketModel{open: $open, high: $high, low: $low, close: $close, vol: $vol, time: $time, amount: $amount, ratio: $ratio, change: $change}';
   }
 }

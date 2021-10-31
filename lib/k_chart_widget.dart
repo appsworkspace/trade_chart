@@ -7,6 +7,7 @@ import 'package:trade_chart/flutter_k_chart.dart';
 
 enum MainState { MA, BOLL, NONE }
 enum SecondaryState { MACD, KDJ, RSI, WR, CCI, NONE }
+enum ThirdState { KD, NONE }
 
 class TimeFormat {
   static const List<String> YEAR_MONTH_DAY = [yyyy, '-', mm, '-', dd];
@@ -28,6 +29,7 @@ class KChartWidget extends StatefulWidget {
   final MainState mainState;
   final bool volHidden;
   final SecondaryState secondaryState;
+  final ThirdState thirdState;
   final Function()? onSecondaryTap;
   final bool isLine;
   final bool hideGrid;
@@ -36,7 +38,6 @@ class KChartWidget extends StatefulWidget {
   final Map<String, ChartTranslations> translations;
   final List<String> timeFormat;
 
-  //当屏幕滚动到尽头会调用，真为拉到屏幕右侧尽头，假为拉到屏幕左侧尽头
   final Function(bool)? onLoadMore;
   final List<Color>? bgColor;
   final int fixedLength;
@@ -54,6 +55,7 @@ class KChartWidget extends StatefulWidget {
     this.chartColors, {
     this.mainState = MainState.MA,
     this.secondaryState = SecondaryState.MACD,
+    this.thirdState = ThirdState.KD,
     this.onSecondaryTap,
     this.volHidden = false,
     this.isLine = false,
@@ -126,6 +128,7 @@ class _KChartWidgetState extends State<KChartWidget>
       mainState: widget.mainState,
       volHidden: widget.volHidden,
       secondaryState: widget.secondaryState,
+      thirdState: widget.thirdState,
       isLine: widget.isLine,
       hideGrid: widget.hideGrid,
       sink: mInfoWindowStream?.sink,

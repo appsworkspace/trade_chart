@@ -1,55 +1,19 @@
-## [0.0.1]
+## [0.1.0]
 
-* Fix Bug
+* Restore
 
-## [0.0.2]
+## [0.1.1]
 
-* Fix Bug
+* Add RSI (9), Add Vol MA20
 
-## [0.0.3]
+## [0.1.2]
 
-* Fix Bug
+* Modify RSI (14,9), Volume MA Color
 
-## [0.0.4]
+## [0.1.3]
 
-* Fix Bug
+* Fix RSI (14,9) Chart
 
-## [0.0.5]
+## [0.1.4]
 
-* Fix Bug
-
-## [0.0.6]
-
-* Modify KDJ
-
-## [0.0.7]
-
-* Modify Indicator KDJ
-
-## [0.0.8]
-
-* Modify RSI
-
-## [0.0.9]
-
-* Calc RSI
-
-## [0.0.10]
-
-* Calc RSI
-
-## [0.0.11]
-
-* Calc MFI
-
-## [0.0.12]
-
-* Calc MFI, RSI, Text Style
-
-## [0.0.13]
-
-* Bar MFI, RSI Signal
-
-## [0.0.14]
-
-* Fix Bugs
+* Add MA High, MA Low, Fix RSI(14,9)

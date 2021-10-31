@@ -2,18 +2,11 @@ import 'package:flutter/material.dart' show Color;
 
 class ChartColors {
 
-  Color overbought = Color(0xff205072);
-  Color strongbuy = Color(0xff329D9C);
-  Color buy = Color(0xff56C596);
-  Color netral = Color(0xff808080);
-  Color sell = Color(0xffFD8F52);
-  Color strongsell = Color(0xffFE676E);
-  Color oversold = Color(0xffC73866);
-
   Color kLineColor = Color(0xff4C86CD);
   Color lineFillColor = Color(0x554C86CD);
   Color ma5Color = Color(0xffC9B885);
   Color ma10Color = Color(0xff6CB0A6);
+  Color ma20Color = Color(0xffC9B885);
   Color ma30Color = Color(0xff9979C6);
   Color upColor = Color(0xff4DAA90);
   Color dnColor = Color(0xffC15466);
@@ -26,7 +19,13 @@ class ChartColors {
   Color kColor = Color(0xffC9B885);
   Color dColor = Color(0xff6CB0A6);
   Color jColor = Color(0xff9979C6);
-  Color rsiColor = Color(0xffC9B885);
+  Color rsiColor = Color(0xffffa500);
+  Color signalrsiColor = Color(0xff009ebf);
+
+  Color macUpperColor = Color(0xff009ebf);
+  Color macLowerColor = Color(0xff009ebf);
+  Color maHighColor = Color(0xff009ebf);
+  Color maLowColor = Color(0xff009ebf);
 
   Color defaultTextColor = Color(0xff60738E);
 

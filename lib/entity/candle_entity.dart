@@ -16,5 +16,15 @@ mixin CandleEntity {
 //  下轨线
   double? dn;
 
+  double? MA;
+  double? hMA;
+  double? lMA;
+  double? uc;
+  double? lc;
+
+
   double? BOLLMA;
+
+  double? highMA;
+  double? lowMA;
 }
