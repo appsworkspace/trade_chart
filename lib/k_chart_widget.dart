@@ -4,13 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:trade_chart/chart_translations.dart';
 import 'package:trade_chart/extension/map_ext.dart';
 import 'package:trade_chart/flutter_k_chart.dart';
+import 'package:intl/intl.dart';
 
-enum MainState { MA, BOLL, NONE }
+enum MainState { MA, BOLL, MAC, NONE }
 enum SecondaryState { MACD, KDJ, RSI, WR, CCI, NONE }
-enum ThirdState { KD, NONE }
 
 class TimeFormat {
-  static const List<String> YEAR_MONTH_DAY = [yyyy, '-', mm, '-', dd];
+  static const List<String> YEAR_MONTH_DAY_SHORT = [dd, ' ', M, ' ', yyyy];
+  static const List<String> YEAR_MONTH_DAY = [dd, ' ', M, ' ', yyyy];
   static const List<String> YEAR_MONTH_DAY_WITH_HOUR = [
     yyyy,
     '-',
@@ -29,7 +30,6 @@ class KChartWidget extends StatefulWidget {
   final MainState mainState;
   final bool volHidden;
   final SecondaryState secondaryState;
-  final ThirdState thirdState;
   final Function()? onSecondaryTap;
   final bool isLine;
   final bool hideGrid;
@@ -38,6 +38,7 @@ class KChartWidget extends StatefulWidget {
   final Map<String, ChartTranslations> translations;
   final List<String> timeFormat;
 
+  //当屏幕滚动到尽头会调用，真为拉到屏幕右侧尽头，假为拉到屏幕左侧尽头
   final Function(bool)? onLoadMore;
   final List<Color>? bgColor;
   final int fixedLength;
@@ -55,14 +56,13 @@ class KChartWidget extends StatefulWidget {
     this.chartColors, {
     this.mainState = MainState.MA,
     this.secondaryState = SecondaryState.MACD,
-    this.thirdState = ThirdState.KD,
     this.onSecondaryTap,
     this.volHidden = false,
     this.isLine = false,
     this.hideGrid = false,
     this.isChinese = false,
     this.translations = kChartTranslations,
-    this.timeFormat = TimeFormat.YEAR_MONTH_DAY,
+    this.timeFormat = TimeFormat.YEAR_MONTH_DAY_SHORT,
     this.onLoadMore,
     this.bgColor,
     this.fixedLength = 2,
@@ -128,7 +128,6 @@ class _KChartWidgetState extends State<KChartWidget>
       mainState: widget.mainState,
       volHidden: widget.volHidden,
       secondaryState: widget.secondaryState,
-      thirdState: widget.thirdState,
       isLine: widget.isLine,
       hideGrid: widget.hideGrid,
       sink: mInfoWindowStream?.sink,
@@ -254,6 +253,18 @@ class _KChartWidgetState extends State<KChartWidget>
 
   void notifyChanged() => setState(() {});
 
+  static noneDecimal(String string) {
+    var formatter = NumberFormat('#,##0');
+    var res = formatter.format(double.parse(string));
+    return res;
+  }
+
+  static String twoDecimal(String string) {
+    var formatter = NumberFormat('#,##0.##');
+    var res = formatter.format(double.parse(string));
+    return res;
+  }
+
   late List<String> infos;
 
   Widget _buildInfoDialog() {
@@ -265,17 +276,17 @@ class _KChartWidgetState extends State<KChartWidget>
               !snapshot.hasData ||
               snapshot.data?.kLineEntity == null) return Container();
           KLineEntity entity = snapshot.data!.kLineEntity;
-          double upDown = entity.change ?? entity.close - entity.open;
-          double upDownPercent = entity.ratio ?? (upDown / entity.open) * 100;
+          double upDown = entity.close - entity.open;
+          double upDownPercent = (upDown / entity.open) * 100;
           infos = [
             getDate(entity.time),
-            entity.open.toStringAsFixed(widget.fixedLength),
-            entity.high.toStringAsFixed(widget.fixedLength),
-            entity.low.toStringAsFixed(widget.fixedLength),
-            entity.close.toStringAsFixed(widget.fixedLength),
-            "${upDown > 0 ? "+" : ""}${upDown.toStringAsFixed(widget.fixedLength)}",
-            "${upDownPercent > 0 ? "+" : ''}${upDownPercent.toStringAsFixed(2)}%",
-            entity.amount.toInt().toString()
+            noneDecimal(entity.open.toStringAsFixed(widget.fixedLength)),
+            noneDecimal(entity.high.toStringAsFixed(widget.fixedLength)),
+            noneDecimal(entity.low.toStringAsFixed(widget.fixedLength)),
+            noneDecimal(entity.close.toStringAsFixed(widget.fixedLength)),
+            "${upDown > 0 ? "+" : ""}${twoDecimal(upDown.toStringAsFixed(widget.fixedLength))}",
+            "${upDownPercent > 0 ? "+" : ''}${twoDecimal(upDownPercent.toStringAsFixed(2))}%",
+            NumberFormat.compact().format(entity.amount).toString(),
           ];
           return Container(
             margin: EdgeInsets.only(
@@ -289,7 +300,7 @@ class _KChartWidgetState extends State<KChartWidget>
             child: ListView.builder(
               padding: EdgeInsets.all(4),
               itemCount: infos.length,
-              itemExtent: 14.0,
+              itemExtent: 18.0,
               shrinkWrap: true,
               itemBuilder: (context, index) {
                 final translations = widget.isChinese
@@ -319,11 +330,16 @@ class _KChartWidgetState extends State<KChartWidget>
       crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
         Expanded(
-            child: Text("$infoName",
-                style: TextStyle(
-                    color: widget.chartColors.infoWindowTitleColor,
-                    fontSize: 10.0))),
-        Text(info, style: TextStyle(color: color, fontSize: 10.0)),
+          child: Text(
+            "$infoName",
+            style: TextStyle(
+              color: widget.chartColors.infoWindowTitleColor,
+              fontSize: 12.0,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+        Text(info, style: TextStyle(color: color, fontSize: 12.0)),
       ],
     );
   }

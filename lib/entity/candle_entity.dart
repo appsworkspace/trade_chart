@@ -5,6 +5,21 @@ mixin CandleEntity {
   late double low;
   late double close;
 
+  double? mac_high;
+  double? mac_upper;
+  double? mac_low;
+  double? mac_lower;
+  double? mac_high_1;
+  double? mac_upper_1;
+  double? mac_low_1;
+  double? mac_lower_1;
+  double? rsi;
+  double? rsi_signal;
+  String? rsi_flag;
+  String? stochastic_kd_flag;
+  double? moving_average;
+  double? top_box;
+  double? bottom_box;
   List<double>? maValueList;
 
 //  上轨线
@@ -16,15 +31,16 @@ mixin CandleEntity {
 //  下轨线
   double? dn;
 
-  double? MA;
-  double? hMA;
-  double? lMA;
-  double? uc;
-  double? lc;
-
-
   double? BOLLMA;
 
-  double? highMA;
-  double? lowMA;
+  // MAC
+  double? macUp;
+  double? macLow;
+
+  double? maH;
+  double? maL;
+  double? ma;
+
+  double? stoch_buy;
+  double? stoch_sell;
 }

@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:trade_chart/utils/number_util.dart';
@@ -7,9 +8,10 @@ import '../entity/index.dart';
 // ignore_for_file: non_constant_identifier_names,library_prefixes,unused_import,camel_case_types
 class DataUtil {
   static calculate(List<KLineEntity> dataList,
-      [List<int> maDayList = const [5, 10, 20], int n = 20, k = 2]) {
+      [List<int> maDayList = const [5, 10, 20], int n = 14, k = 2]) {
     calcMA(dataList, maDayList);
     calcBOLL(dataList, n, k);
+    calcMAC(dataList, n);
     calcVolumeMA(dataList);
     calcKDJ(dataList);
     calcMACD(dataList);
@@ -42,6 +44,25 @@ class DataUtil {
     }
   }
 
+  static void calcMAC(List<KLineEntity> dataList, int n) {
+    if (dataList.isNotEmpty) {
+      for (int i = 0; i < dataList.length; i++) {
+        KLineEntity entity = dataList[i];
+        entity.mac_high = entity.mac_high;
+        entity.mac_upper = entity.mac_upper;
+        entity.mac_low = entity.mac_low;
+        entity.mac_lower = entity.mac_lower;
+        entity.mac_high_1 = entity.mac_high_1;
+        entity.mac_upper_1 = entity.mac_upper_1;
+        entity.mac_low_1 = entity.mac_low_1;
+        entity.mac_lower_1 = entity.mac_lower_1;
+        entity.moving_average = entity.moving_average;
+        entity.top_box = entity.top_box;
+        entity.bottom_box = entity.bottom_box;
+      }
+    }
+  }
+
   static void calcBOLL(List<KLineEntity> dataList, int n, int k) {
     _calcBOLLMA(n, dataList);
     for (int i = 0; i < dataList.length; i++) {
@@ -50,13 +71,13 @@ class DataUtil {
         double md = 0;
         for (int j = i - n + 1; j <= i; j++) {
           double c = dataList[j].close;
-          double m = entity.MA!;
+          double m = entity.BOLLMA!;
           double value = c - m;
           md += value * value;
         }
         md = md / (n - 1);
         md = sqrt(md);
-        entity.mb = entity.MA!;
+        entity.mb = entity.BOLLMA!;
         entity.up = entity.mb! + k * md;
         entity.dn = entity.mb! - k * md;
       }
@@ -65,29 +86,16 @@ class DataUtil {
 
   static void _calcBOLLMA(int day, List<KLineEntity> dataList) {
     double ma = 0;
-    double hma = 0;
-    double lma = 0;
     for (int i = 0; i < dataList.length; i++) {
       KLineEntity entity = dataList[i];
       ma += entity.close;
-      hma += entity.high;
-      lma += entity.low;
-
       if (i == day - 1) {
-        entity.MA = ma / day;
-        entity.hMA = hma / day;
-        entity.lMA = lma / day;
+        entity.BOLLMA = ma / day;
       } else if (i >= day) {
         ma -= dataList[i - day].close;
-        hma -= dataList[i - day].high;
-        lma -= dataList[i - day].low;
-        entity.MA = ma / day;
-        entity.hMA = hma / day;
-        entity.lMA = lma / day;
+        entity.BOLLMA = ma / day;
       } else {
-        entity.MA = 0;
-        entity.hMA = 0;
-        entity.lMA = 0;
+        entity.BOLLMA = null;
       }
     }
   }
@@ -169,56 +177,33 @@ class DataUtil {
     double? signal;
     double rsiABSEma = 0;
     double rsiMaxEma = 0;
-
-    double rsiABSEma9 = 0;
-    double rsiMaxEma9 = 0;
-
+    double signalABSEma = 0;
+    double signalMaxEma = 0;
     for (int i = 0; i < dataList.length; i++) {
       KLineEntity entity = dataList[i];
-
       final double closePrice = entity.close;
       if (i == 0) {
         rsi = 0;
-        signal = 0;
         rsiABSEma = 0;
         rsiMaxEma = 0;
-        rsiABSEma9 = 0;
-        rsiMaxEma9 = 0;
       } else {
         double Rmax = max(0, closePrice - dataList[i - 1].close.toDouble());
         double RAbs = (closePrice - dataList[i - 1].close.toDouble()).abs();
 
         rsiMaxEma = (Rmax + (14 - 1) * rsiMaxEma) / 14;
         rsiABSEma = (RAbs + (14 - 1) * rsiABSEma) / 14;
-
-        rsiMaxEma9 = (Rmax + (9 - 1) * rsiMaxEma9) / 9;
-        rsiABSEma9 = (RAbs + (9 - 1) * rsiABSEma9) / 9;
-
         rsi = (rsiMaxEma / rsiABSEma) * 100;
-        signal = ((rsiMaxEma9 / rsiABSEma9)) * 100;
+
+        signalMaxEma = (Rmax + (9 - 1) * signalMaxEma) / 9;
+        signalABSEma = (RAbs + (9 - 1) * signalABSEma) / 9;
+        signal = (signalMaxEma / signalABSEma) * 100;
       }
-      if (i < 8) rsi = null;
+      if (i < 13) rsi = null;
       if (rsi != null && rsi.isNaN) rsi = null;
       entity.rsi = rsi;
-      if (i < 13) signal = null;
+      if (i < 8) rsi = null;
       if (signal != null && signal.isNaN) signal = null;
       entity.signal = signal;
-    }
-  }
-
-    static void _calcRSIMA(int day, List<KLineEntity> dataList) {
-    double ma = 0;
-    for (int i = 0; i < dataList.length; i++) {
-      KLineEntity entity = dataList[i];
-      ma += entity.close;
-      if (i == day - 1) {
-        entity.signal = ma / day;
-      } else if (i >= day) {
-        ma -= dataList[i - day].close;
-        entity.signal = ma / day;
-      } else {
-        entity.signal = null;
-      }
     }
   }
 
@@ -247,7 +232,7 @@ class DataUtil {
       var rsv = (cur - low) * 100.0 / (high - low);
       rsv = rsv.isNaN ? 0 : rsv;
       final k = (2 * preK + rsv) / 3.0;
-      final d = (2 * preD + k)/ 3.0;
+      final d = (2 * preD + k) / 3.0;
       final j = 3 * k - 2 * d;
       preK = k;
       preD = d;
@@ -300,7 +285,8 @@ class DataUtil {
       final ma = amount / len;
       amount = 0.0;
       for (int n = start; n <= i; n++) {
-        amount += (ma - (dataList[n].high + dataList[n].low + dataList[n].close) / 3)
+        amount +=
+            (ma - (dataList[n].high + dataList[n].low + dataList[n].close) / 3)
                 .abs();
       }
       final md = amount / len;

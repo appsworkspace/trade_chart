@@ -1,7 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart'
-    show Color, TextStyle, Rect, Canvas, Size, CustomPainter;
+    show Canvas, Color, CustomPainter, FontWeight, Rect, Size, TextStyle;
 import 'package:trade_chart/utils/date_format_util.dart';
 
 import '../chart_style.dart' show ChartStyle;
@@ -17,16 +17,15 @@ abstract class BaseChartPainter extends CustomPainter {
   MainState mainState;
 
   SecondaryState secondaryState;
-  ThirdState thirdState;
 
   bool volHidden;
   double scaleX = 1.0, scrollX = 0.0, selectX;
   bool isLongPress = false;
   bool isLine;
 
-  //3 area size and location
+  //3块区域大小与位置
   late Rect mMainRect;
-  Rect? mVolRect, mSecondaryRect, mThirdRect;
+  Rect? mVolRect, mSecondaryRect;
   late double mDisplayHeight, mWidth;
   double mTopPadding = 30.0, mBottomPadding = 20.0, mChildPadding = 12.0;
   final int mGridRows = 4, mGridColumns = 4;
@@ -35,17 +34,15 @@ abstract class BaseChartPainter extends CustomPainter {
   double mVolMaxValue = double.minPositive, mVolMinValue = double.maxFinite;
   double mSecondaryMaxValue = double.minPositive,
       mSecondaryMinValue = double.maxFinite;
-  double mThirdMaxValue = double.minPositive,
-      mThirdMinValue = double.maxFinite;
   double mTranslateX = double.minPositive;
   int mMainMaxIndex = 0, mMainMinIndex = 0;
   double mMainHighMaxValue = double.minPositive,
       mMainLowMinValue = double.maxFinite;
   int mItemCount = 0;
-  double mDataLen = 0.0; //Data occupies the total length of the screen
+  double mDataLen = 0.0; //数据占屏幕总长度
   final ChartStyle chartStyle;
   late double mPointWidth;
-  List<String> mFormats = [yyyy, '-', mm, '-', dd, ' ', HH, ':', nn]; //Format time
+  List<String> mFormats = [yyyy, '-', mm, '-', dd, ' ', HH, ':', nn]; //格式化时间
 
   BaseChartPainter(
     this.chartStyle, {
@@ -57,7 +54,6 @@ abstract class BaseChartPainter extends CustomPainter {
     this.mainState = MainState.MA,
     this.volHidden = false,
     this.secondaryState = SecondaryState.MACD,
-    this.thirdState = ThirdState.KD,
     this.isLine = false,
   }) {
     mItemCount = datas?.length ?? 0;
@@ -73,13 +69,13 @@ abstract class BaseChartPainter extends CustomPainter {
     int secondTime = datas![1].time ?? 0;
     int time = secondTime - firstTime;
     time ~/= 1000;
-    //Month Line
+    //月线
     if (time >= 24 * 60 * 60 * 28)
-      mFormats = [yy, '-', mm];
-    //Daily etc
+      mFormats = [mm, '-', yy];
+    //日线等
     else if (time >= 24 * 60 * 60)
-      mFormats = [yy, '-', mm, '-', dd];
-    //Hour line etc
+      mFormats = [dd, ' ', M, ' ', yy];
+    //小时线等
     else
       mFormats = [mm, '-', dd, ' ', HH, ':', nn];
   }
@@ -111,16 +107,16 @@ abstract class BaseChartPainter extends CustomPainter {
 
   void initChartRenderer();
 
-  //Draw Background
+  //画背景
   void drawBg(Canvas canvas, Size size);
 
-  //Draw Grid
+  //画网格
   void drawGrid(canvas);
 
-  //Draw a chart
+  //画图表
   void drawChart(Canvas canvas, Size size);
 
-  //Draw right value
+  //画右边值
   void drawRightText(canvas);
 
   //画时间
@@ -142,13 +138,10 @@ abstract class BaseChartPainter extends CustomPainter {
     double volHeight = volHidden != true ? mDisplayHeight * 0.2 : 0;
     double secondaryHeight =
         secondaryState != SecondaryState.NONE ? mDisplayHeight * 0.2 : 0;
-    double thirdHeight =
-        thirdState != ThirdState.NONE ? mDisplayHeight * 0.2 : 0;
 
     double mainHeight = mDisplayHeight;
     mainHeight -= volHeight;
     mainHeight -= secondaryHeight;
-    mainHeight -= thirdHeight;
 
     mMainRect = Rect.fromLTRB(0, mTopPadding, mWidth, mTopPadding + mainHeight);
 
@@ -165,14 +158,6 @@ abstract class BaseChartPainter extends CustomPainter {
           mWidth,
           mMainRect.bottom + volHeight + secondaryHeight);
     }
-    //thirdState == ThirdState.NONE隐藏副视图
-    if (thirdState != ThirdState.NONE) {
-      mThirdRect = Rect.fromLTRB(
-          0,
-          mMainRect.bottom + volHeight + secondaryHeight + mChildPadding,
-          mWidth,
-          mMainRect.bottom + volHeight + secondaryHeight + thirdHeight);
-    }
   }
 
   calculateValue() {
@@ -187,7 +172,6 @@ abstract class BaseChartPainter extends CustomPainter {
       getMainMaxMinValue(item, i);
       getVolMaxMinValue(item);
       getSecondaryMaxMinValue(item);
-      getThirdMaxMinValue(item);
     }
   }
 
@@ -203,6 +187,29 @@ abstract class BaseChartPainter extends CustomPainter {
       } else if (mainState == MainState.BOLL) {
         maxPrice = max(item.up ?? 0, item.high);
         minPrice = min(item.dn ?? 0, item.low);
+      } else if (mainState == MainState.MAC) {
+        maxPrice = max(
+            item.high,
+            _findMaxMA([
+              item.mac_high ?? 0,
+              item.mac_low ?? 0,
+              item.mac_high_1 ?? 0,
+              item.mac_low_1 ?? 0,
+              item.top_box ?? 0,
+              item.bottom_box ?? 0,
+              item.moving_average ?? 0
+            ]));
+        minPrice = min(
+            item.low,
+            _findMinMA([
+              item.mac_high ?? 0,
+              item.mac_low ?? 0,
+              item.mac_high_1 ?? 0,
+              item.mac_low_1 ?? 0,
+              item.top_box ?? 0,
+              item.bottom_box ?? 0,
+              item.moving_average ?? 0
+            ]));
       } else {
         maxPrice = item.high;
         minPrice = item.low;
@@ -238,10 +245,18 @@ abstract class BaseChartPainter extends CustomPainter {
   }
 
   void getVolMaxMinValue(KLineEntity item) {
-    mVolMaxValue = max(mVolMaxValue,
-        max(item.vol, max(item.MA5Volume ?? 0, item.MA10Volume ?? 0)));
-    mVolMinValue = min(mVolMinValue,
-        min(item.vol, min(item.MA5Volume ?? 0, item.MA10Volume ?? 0)));
+    mVolMaxValue = max(
+        mVolMaxValue,
+        max(
+            item.vol,
+            max(item.MA5Volume ?? 0,
+                max(item.MA10Volume ?? 0, item.MA20Volume ?? 0))));
+    mVolMinValue = min(
+        mVolMinValue,
+        min(
+            item.vol,
+            min(item.MA5Volume ?? 0,
+                min(item.MA10Volume ?? 0, item.MA20Volume ?? 0))));
   }
 
   void getSecondaryMaxMinValue(KLineEntity item) {
@@ -261,8 +276,10 @@ abstract class BaseChartPainter extends CustomPainter {
       }
     } else if (secondaryState == SecondaryState.RSI) {
       if (item.rsi != null) {
-        mSecondaryMaxValue = 100;
-        mSecondaryMinValue = 0;
+        mSecondaryMaxValue =
+            max(mSecondaryMaxValue, max(item.rsi ?? 0, item.signal ?? 0));
+        mSecondaryMinValue =
+            min(mSecondaryMinValue, min(item.rsi ?? 0, item.signal ?? 0));
       }
     } else if (secondaryState == SecondaryState.WR) {
       mSecondaryMaxValue = 0;
@@ -275,20 +292,6 @@ abstract class BaseChartPainter extends CustomPainter {
     } else {
       mSecondaryMaxValue = 0;
       mSecondaryMinValue = 0;
-    }
-  }
-
-  void getThirdMaxMinValue(KLineEntity item) {
-    if (thirdState == ThirdState.KD) {
-      if (item.d != null) {
-        mThirdMaxValue =
-            max(mThirdMaxValue, max(item.k!, max(item.d!, item.j!)));
-        mThirdMinValue =
-            min(mThirdMinValue, min(item.k!, min(item.d!, item.j!)));
-      }
-    } else {
-      mThirdMaxValue = 0;
-      mThirdMinValue = 0;
     }
   }
 
@@ -361,6 +364,14 @@ abstract class BaseChartPainter extends CustomPainter {
       (translateX + mTranslateX) * scaleX;
 
   TextStyle getTextStyle(Color color) {
+    return TextStyle(
+      fontSize: 12.0,
+      color: color,
+      fontWeight: FontWeight.bold,
+    );
+  }
+
+  TextStyle getTextStyle2(Color color) {
     return TextStyle(fontSize: 10.0, color: color);
   }
 

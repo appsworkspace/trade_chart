@@ -1,12 +1,32 @@
 import 'dart:math';
 
+import 'package:intl/intl.dart';
+
 class NumberUtil {
+  static String twoDecimal(String string) {
+    var formatter = NumberFormat('#,##0.##');
+    var res = formatter.format(double.parse(string));
+    return res;
+  }
+
+  static String fourDecimal(String string) {
+    var formatter = NumberFormat('#,##0.####');
+    var res = formatter.format(double.parse(string));
+    return res;
+  }
+
+  static String formatNumber(double n) {
+    var formatter = NumberFormat('#,##0.####');
+    var res = formatter.format(n);
+    return "${res}";
+  }
+
   static String format(double n) {
     if (n >= 10000) {
       n /= 1000;
-      return "${n.toStringAsFixed(2)}K";
+      return "${twoDecimal(n.toString())}K";
     } else {
-      return n.toStringAsFixed(4);
+      return "${fourDecimal(n.toString())}";
     }
   }
 

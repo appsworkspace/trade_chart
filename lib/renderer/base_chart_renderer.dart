@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 export '../chart_style.dart';
 
@@ -38,11 +39,17 @@ abstract class BaseChartRenderer<T> {
 
   double getY(double y) => (maxValue - y) * scaleY + chartRect.top;
 
+  static noneDecimal(String string) {
+    var formatter = NumberFormat('#,##0');
+    var res = formatter.format(double.parse(string));
+    return res;
+  }
+
   String format(double? n) {
     if (n == null || n.isNaN) {
-      return "0.00";
+      return "0";
     } else {
-      return n.toStringAsFixed(fixedLength);
+      return noneDecimal(n.toStringAsFixed(fixedLength));
     }
   }
 
@@ -68,7 +75,25 @@ abstract class BaseChartRenderer<T> {
         Offset(lastX, lastY), Offset(curX, curY), chartPaint..color = color);
   }
 
+  void drawLine2(double? lastPrice, double? curPrice, Canvas canvas,
+      double lastX, double curX, Paint paint) {
+
+    if (lastPrice == null || curPrice == null) {
+      return;
+    }
+    //("lasePrice==" + lastPrice.toString() + "==curPrice==" + curPrice.toString());
+    double lastY = getY(lastPrice);
+    double curY = getY(curPrice);
+    //print("lastX-----==" + lastX.toString() + "==lastY==" + lastY.toString() + "==curX==" + curX.toString() + "==curY==" + curY.toString());
+    canvas.drawLine(
+        Offset(lastX, lastY), Offset(curX, curY), paint);
+  }
+
   TextStyle getTextStyle(Color color) {
+    return TextStyle(fontSize: 11.0, color: color);
+  }
+
+  TextStyle getTextStyle2(Color color) {
     return TextStyle(fontSize: 10.0, color: color);
   }
 }

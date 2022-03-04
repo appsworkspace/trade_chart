@@ -22,12 +22,13 @@ class SecondaryRenderer extends BaseChartRenderer<MACDEntity> {
       this.chartStyle,
       this.chartColors)
       : super(
-            chartRect: mainRect,
-            maxValue: maxValue,
-            minValue: minValue,
-            topPadding: topPadding,
-            fixedLength: fixedLength,
-            gridColor: chartColors.gridColor,) {
+          chartRect: mainRect,
+          maxValue: maxValue,
+          minValue: minValue,
+          topPadding: topPadding,
+          fixedLength: fixedLength,
+          gridColor: chartColors.gridColor,
+        ) {
     mMACDWidth = this.chartStyle.macdWidth;
   }
 
@@ -39,20 +40,19 @@ class SecondaryRenderer extends BaseChartRenderer<MACDEntity> {
         drawMACD(curPoint, canvas, curX, lastPoint, lastX);
         break;
       case SecondaryState.KDJ:
-        drawRSILine(curPoint, canvas, curX, lastPoint, lastX);
-        // drawLine(lastPoint.k, curPoint.k, canvas, lastX, curX,
-        //     this.chartColors.kColor);
-        // drawLine(lastPoint.d, curPoint.d, canvas, lastX, curX,
-        //     this.chartColors.dColor);
-        // drawLine(lastPoint.j, curPoint.j, canvas, lastX, curX,
-        //     this.chartColors.jColor);
+        drawLine(lastPoint.k, curPoint.k, canvas, lastX, curX,
+            this.chartColors.kColor);
+        drawLine(lastPoint.d, curPoint.d, canvas, lastX, curX,
+            this.chartColors.dColor);
+        drawLine(lastPoint.j, curPoint.j, canvas, lastX, curX,
+            this.chartColors.jColor);
         break;
       case SecondaryState.RSI:
-      drawRSILine(curPoint, canvas, curX, lastPoint, lastX);
-        // drawLine(lastPoint.rsi, curPoint.rsi, canvas, lastX, curX,
-        //     this.chartColors.dColor);
-        // drawLine(lastPoint.rsi9, curPoint.rsi9, canvas, lastX, curX,
-        //     this.chartColors.jColor);
+        drawLine(lastPoint.rsi, curPoint.rsi, canvas, lastX, curX,
+            this.chartColors.rsiColor);
+        drawLine(lastPoint.signal, curPoint.signal, canvas, lastX, curX,
+            this.chartColors.signalColor);
+        drawLine(50, 50, canvas, lastX, curX, Colors.blue);
         break;
       case SecondaryState.WR:
         drawLine(lastPoint.r, curPoint.r, canvas, lastX, curX,
@@ -65,20 +65,6 @@ class SecondaryRenderer extends BaseChartRenderer<MACDEntity> {
       default:
         break;
     }
-  }
-
-  void drawRSILine(MACDEntity curPoint, Canvas canvas, double curX,
-      MACDEntity lastPoint, double lastX) {
-    double lineR = 2;
-    if (lastPoint.rsi != 0) {
-      drawLine(lastPoint.rsi, curPoint.rsi, canvas, lastX, curX,
-          this.chartColors.signalrsiColor);
-      drawLine(50, 50, canvas, lastX, curX,
-          Colors.blue);
-      drawLine(lastPoint.signal, curPoint.signal, canvas, lastX, curX,
-          this.chartColors.rsiColor);
-    }
-
   }
 
   void drawMACD(MACDEntity curPoint, Canvas canvas, double curX,
@@ -149,11 +135,11 @@ class SecondaryRenderer extends BaseChartRenderer<MACDEntity> {
       case SecondaryState.RSI:
         children = [
           TextSpan(
-              text: "RSI(14,9)(${format(data.signal)})    ",
+              text: "RSI(14,9): ${format(data.rsi)}    ",
               style: getTextStyle(this.chartColors.rsiColor)),
           TextSpan(
-              text: "Signal(${format(data.rsi)})    ",
-              style: getTextStyle(this.chartColors.signalrsiColor)),
+              text: "SIGNAL: ${format(data.signal)}    ",
+              style: getTextStyle(this.chartColors.signalColor)),
         ];
         break;
       case SecondaryState.WR:

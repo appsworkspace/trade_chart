@@ -8,16 +8,15 @@ class ChartTranslations {
   final String change;
   final String amount;
 
-  const ChartTranslations({
-    this.date = 'Date',
-    this.open = 'Open',
-    this.high = 'High',
-    this.low = 'Low',
-    this.close = 'Close',
-    this.changeAmount = 'Change',
-    this.change = 'Change%',
-    this.amount = 'Amount',
-  });
+  const ChartTranslations(
+      {this.date = 'Date',
+      this.open = 'Open',
+      this.high = 'High',
+      this.low = 'Low',
+      this.close = 'Close',
+      this.changeAmount = 'Change',
+      this.change = 'Change%',
+      this.amount = 'Amount'});
 
   String byIndex(int index) {
     switch (index) {

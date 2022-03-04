@@ -11,12 +11,13 @@ class VolRenderer extends BaseChartRenderer<VolumeEntity> {
   VolRenderer(Rect mainRect, double maxValue, double minValue,
       double topPadding, int fixedLength, this.chartStyle, this.chartColors)
       : super(
-            chartRect: mainRect,
-            maxValue: maxValue,
-            minValue: minValue,
-            topPadding: topPadding,
-            fixedLength: fixedLength,
-            gridColor: chartColors.gridColor,) {
+          chartRect: mainRect,
+          maxValue: maxValue,
+          minValue: minValue,
+          topPadding: topPadding,
+          fixedLength: fixedLength,
+          gridColor: chartColors.gridColor,
+        ) {
     mVolWidth = this.chartStyle.volWidth;
   }
 
@@ -31,23 +32,23 @@ class VolRenderer extends BaseChartRenderer<VolumeEntity> {
           Rect.fromLTRB(curX - r, top, curX + r, bottom),
           chartPaint
             ..color = curPoint.close > curPoint.open
-                ? this.chartColors.upColor
-                : this.chartColors.dnColor);
+                ? this.chartColors.upColor.withOpacity(.1)
+                : this.chartColors.dnColor.withOpacity(.1));
     }
 
     // if (lastPoint.MA5Volume != 0) {
     //   drawLine(lastPoint.MA5Volume, curPoint.MA5Volume, canvas, lastX, curX,
     //       this.chartColors.ma5Color);
     // }
-
+    //
     // if (lastPoint.MA10Volume != 0) {
     //   drawLine(lastPoint.MA10Volume, curPoint.MA10Volume, canvas, lastX, curX,
     //       this.chartColors.ma10Color);
     // }
-    if (lastPoint.MA20Volume != 0) {
-      drawLine(lastPoint.MA20Volume, curPoint.MA20Volume, canvas, lastX, curX,
-          this.chartColors.ma10Color);
-    }
+    // if (lastPoint.MA20Volume != 0) {
+    //   drawLine(lastPoint.MA20Volume, curPoint.MA20Volume, canvas, lastX, curX,
+    //       this.chartColors.ma20Color);
+    // }
   }
 
   double getVolY(double value) =>
@@ -57,32 +58,36 @@ class VolRenderer extends BaseChartRenderer<VolumeEntity> {
   void drawText(Canvas canvas, VolumeEntity data, double x) {
     TextSpan span = TextSpan(
       children: [
-        TextSpan(
-            text: "VOL:${NumberUtil.format(data.vol)}    ",
-            style: getTextStyle(this.chartColors.volColor)),
-        if (data.MA5Volume.notNullOrZero)
-          TextSpan(
-              text: "MA20:${NumberUtil.format(data.MA20Volume!)}    ",
-              style: getTextStyle(this.chartColors.ma10Color)),
+        // TextSpan(
+        //     text: "VOL: ${NumberUtil.format(data.vol)}    ",
+        //     style: getTextStyle2(this.chartColors.volColor)),
+        // if (data.MA5Volume.notNullOrZero)
+        //   TextSpan(
+        //       text: "MA5:${NumberUtil.format(data.MA5Volume!)}    ",
+        //       style: getTextStyle(this.chartColors.ma5Color)),
         // if (data.MA10Volume.notNullOrZero)
         //   TextSpan(
         //       text: "MA10:${NumberUtil.format(data.MA10Volume!)}    ",
         //       style: getTextStyle(this.chartColors.ma10Color)),
+        // if (data.MA20Volume.notNullOrZero)
+        //   TextSpan(
+        //       text: "MA(20): ${NumberUtil.format(data.MA20Volume!)}    ",
+        //       style: getTextStyle(this.chartColors.ma20Color)),
       ],
     );
     TextPainter tp = TextPainter(text: span, textDirection: TextDirection.ltr);
     tp.layout();
-    tp.paint(canvas, Offset(x, chartRect.top - topPadding));
+    tp.paint(canvas, Offset(x, chartRect.top));
   }
 
   @override
   void drawRightText(canvas, textStyle, int gridRows) {
-    TextSpan span =
-        TextSpan(text: "${NumberUtil.format(maxValue)}", style: textStyle);
-    TextPainter tp = TextPainter(text: span, textDirection: TextDirection.ltr);
-    tp.layout();
-    tp.paint(
-        canvas, Offset(chartRect.width - tp.width, chartRect.top - topPadding));
+    // TextSpan span =
+    //     TextSpan(text: "${NumberUtil.format(maxValue)}", style: textStyle);
+    // TextPainter tp = TextPainter(text: span, textDirection: TextDirection.ltr);
+    // tp.layout();
+    // tp.paint(canvas,
+    //     Offset(chartRect.width - tp.width, chartRect.top - topPadding + 10));
   }
 
   @override

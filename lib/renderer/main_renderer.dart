@@ -10,7 +10,6 @@ class MainRenderer extends BaseChartRenderer<CandleEntity> {
   MainState state;
   bool isLine;
 
-  //绘制的内容区域
   late Rect _contentRect;
   double _contentPadding = 5.0;
   List<int> maDayList;
@@ -63,6 +62,8 @@ class MainRenderer extends BaseChartRenderer<CandleEntity> {
     if (isLine == true) return;
     TextSpan? span;
     TextSpan? span2;
+    TextSpan? span3;
+    TextSpan? span4;
     if (state == MainState.MA) {
       span = TextSpan(
         children: _createMATextSpan(data),
@@ -70,41 +71,62 @@ class MainRenderer extends BaseChartRenderer<CandleEntity> {
     } else if (state == MainState.BOLL) {
       span = TextSpan(
         children: [
-          if (data.MA != 0)
-            TextSpan(
-                text: "MA(20):${format(data.MA)}    ",
-                style: getTextStyle(this.chartColors.ma20Color)),
-          if (data.hMA != 0)
-            TextSpan(
-                text: "High MA:${format(data.hMA)}    ",
-                style: getTextStyle(this.chartColors.maHighColor)),
-          if (data.lMA != 0)
-            TextSpan(
-                text: "Low MA:${format(data.lMA)}    ",
-                style: getTextStyle(this.chartColors.maLowColor)),
-        ],
-      );
-      span2 = TextSpan(
-        children: [
           if (data.up != 0)
             TextSpan(
-                text: "MAC Upper:${format(data.up)}    ",
-                style: getTextStyle(this.chartColors.macUpperColor)),
+                text: "BOLL:${format(data.mb)}    ",
+                style: getTextStyle(this.chartColors.ma5Color)),
+          if (data.mb != 0)
+            TextSpan(
+                text: "UB:${format(data.up)}    ",
+                style: getTextStyle(this.chartColors.ma10Color)),
           if (data.dn != 0)
             TextSpan(
-                text: "MAC Lower:${format(data.dn)}    ",
-                style: getTextStyle(this.chartColors.macLowerColor)),
+                text: "LB:${format(data.dn)}    ",
+                style: getTextStyle(this.chartColors.ma30Color)),
         ],
+      );
+      span2 = TextSpan(children: []);
+      span3 = TextSpan(children: []);
+    } else if (state == MainState.MAC) {
+      span = TextSpan(children: [
+        if (data.top_box != 0)
+          TextSpan(
+              text: "TBox(5) (${format(data.top_box)})  ",
+              style: getTextStyle2(this.chartColors.TBoxColor)),
+        if (data.bottom_box != 0)
+          TextSpan(
+              text: "BBox(5) (${format(data.bottom_box)})  ",
+              style: getTextStyle2(this.chartColors.BBoxColor)),
+        if (data.moving_average != 0)
+          TextSpan(
+              text: "MA(14) (${format(data.moving_average)})  ",
+              style: getTextStyle2(this.chartColors.ma20Color)),
+        if (data.mac_high != 0)
+          TextSpan(
+              text: "MACHigh(5) (${format(data.mac_high)})  ",
+              style: getTextStyle2(this.chartColors.maHighColor)),
+      ]);
+      span2 = TextSpan(
+        children: [],
+      );
+      span3 = TextSpan(
+        children: [],
       );
     }
     if (span == null) return;
     TextPainter tp = TextPainter(text: span, textDirection: TextDirection.ltr);
     tp.layout();
     tp.paint(canvas, Offset(x, chartRect.top - topPadding));
-    if (span2 == null) return;
-    TextPainter tp2 = TextPainter(text: span2, textDirection: TextDirection.ltr);
+
+    TextPainter tp2 =
+        TextPainter(text: span2, textDirection: TextDirection.ltr);
     tp2.layout();
-    tp2.paint(canvas, Offset(x, chartRect.top));
+    tp2.paint(canvas, Offset(x, chartRect.top - topPadding + 15));
+
+    TextPainter tp3 =
+        TextPainter(text: span3, textDirection: TextDirection.ltr);
+    tp3.layout();
+    tp3.paint(canvas, Offset(x, chartRect.top - topPadding + 30));
   }
 
   List<InlineSpan> _createMATextSpan(CandleEntity data) {
@@ -125,7 +147,8 @@ class MainRenderer extends BaseChartRenderer<CandleEntity> {
       double curX, Size size, Canvas canvas) {
     if (isLine != true) {
       drawCandle(curPoint, canvas, curX);
-      // drawIndicator(curPoint, canvas, curX);
+      drawRSISignal(curPoint, canvas, curX);
+      drawStochKDSignal(curPoint, canvas, curX);
     }
     if (isLine == true) {
       drawPolyline(lastPoint.close, curPoint.close, canvas, lastX, curX);
@@ -133,6 +156,8 @@ class MainRenderer extends BaseChartRenderer<CandleEntity> {
       drawMaLine(lastPoint, curPoint, canvas, lastX, curX);
     } else if (state == MainState.BOLL) {
       drawBollLine(lastPoint, curPoint, canvas, lastX, curX);
+    } else if (state == MainState.MAC) {
+      drawMACLine(lastPoint, curPoint, canvas, lastX, curX);
     }
   }
 
@@ -142,25 +167,18 @@ class MainRenderer extends BaseChartRenderer<CandleEntity> {
     ..style = PaintingStyle.fill
     ..isAntiAlias = true;
 
-  //画折线图
+  Paint painter = Paint()
+    ..color = Colors.purpleAccent
+    ..style = PaintingStyle.fill;
+
   drawPolyline(double lastPrice, double curPrice, Canvas canvas, double lastX,
       double curX) {
-//    drawLine(lastPrice + 100, curPrice + 100, canvas, lastX, curX, ChartColors.kLineColor);
     mLinePath ??= Path();
-
-//    if (lastX == curX) {
-//      mLinePath.moveTo(lastX, getY(lastPrice));
-//    } else {
-////      mLinePath.lineTo(curX, getY(curPrice));
-//      mLinePath.cubicTo(
-//          (lastX + curX) / 2, getY(lastPrice), (lastX + curX) / 2, getY(curPrice), curX, getY(curPrice));
-//    }
     if (lastX == curX) lastX = 0; //起点位置填充
     mLinePath!.moveTo(lastX, getY(lastPrice));
     mLinePath!.cubicTo((lastX + curX) / 2, getY(lastPrice), (lastX + curX) / 2,
         getY(curPrice), curX, getY(curPrice));
 
-//    //画阴影
     mLineFillShader ??= LinearGradient(
       begin: Alignment.topCenter,
       end: Alignment.bottomCenter,
@@ -204,64 +222,157 @@ class MainRenderer extends BaseChartRenderer<CandleEntity> {
       Canvas canvas, double lastX, double curX) {
     if (lastPoint.up != 0) {
       drawLine(lastPoint.up, curPoint.up, canvas, lastX, curX,
-          this.chartColors.macUpperColor);
+          this.chartColors.ma10Color);
     }
     if (lastPoint.mb != 0) {
       drawLine(lastPoint.mb, curPoint.mb, canvas, lastX, curX,
-          this.chartColors.ma20Color);
+          this.chartColors.ma5Color);
     }
     if (lastPoint.dn != 0) {
       drawLine(lastPoint.dn, curPoint.dn, canvas, lastX, curX,
-          this.chartColors.macLowerColor);
-    }
-
-    if (lastPoint.hMA != 0) {
-      drawLine(lastPoint.hMA, curPoint.hMA, canvas, lastX, curX,
-          this.chartColors.maHighColor);
-    }
-    if (lastPoint.lMA != 0) {
-      drawLine(lastPoint.lMA, curPoint.lMA, canvas, lastX, curX,
-          this.chartColors.maLowColor);
+          this.chartColors.ma30Color);
     }
   }
 
-  // Indicator Stochastic K_D (12,5,5) Signal Search
-  void drawIndicator(CandleEntity curPoint, Canvas canvas, double curX) {
+  void drawMACLine(CandleEntity lastPoint, CandleEntity curPoint, Canvas canvas,
+      double lastX, double curX) {
+    // Top Box Bottom Box
+    if (lastPoint.top_box != 0) {
+      final Paint paint = Paint();
+      paint.color = this.chartColors.TBoxColor;
+      paint.strokeCap = StrokeCap.square;
+      paint.strokeWidth = 1.5;
+      drawLine2(
+          lastPoint.top_box, curPoint.top_box, canvas, lastX, curX, paint);
+    }
+    if (lastPoint.bottom_box != 0) {
+      final Paint paint = Paint();
+      paint.color = this.chartColors.BBoxColor;
+      paint.strokeCap = StrokeCap.square;
+      paint.strokeWidth = 1.5;
+      drawLine2(lastPoint.bottom_box, curPoint.bottom_box, canvas, lastX, curX,
+          paint);
+    }
+    if (lastPoint.moving_average != 0) {
+      final Paint paint = Paint();
+      paint.color = this.chartColors.ma20Color;
+      paint.strokeCap = StrokeCap.square;
+      paint.strokeWidth = 1.5;
+      drawLine2(lastPoint.moving_average, curPoint.moving_average, canvas,
+          lastX, curX, paint);
+    }
+    if (lastPoint.mac_high != 0) {
+      final Paint paint = Paint();
+      paint.color = this.chartColors.maHighColor;
+      paint.strokeCap = StrokeCap.square;
+      paint.strokeWidth = 1.5;
+      drawLine2(
+          lastPoint.mac_high, curPoint.mac_high, canvas, lastX, curX, paint);
+    }
+  }
+
+  void drawStochKDSignal(CandleEntity curPoint, Canvas canvas, double curX) {
     var high = getY(curPoint.high);
     var low = getY(curPoint.low);
     var open = getY(curPoint.open);
     var close = getY(curPoint.close);
+    var path = Path();
     double r = mCandleWidth / 2;
     double lineR = mCandleLineWidth / 2;
     if (open >= close) {
       // SELL
-      if((curPoint.open-curPoint.low)<((curPoint.high-curPoint.close))){
-        chartPaint.color = Colors.red;
-        canvas.drawRect(
-            Rect.fromLTRB(curX - lineR, high-20, curX + lineR, high-10), chartPaint);
+      if (curPoint.stochastic_kd_flag == "SHORT" &&
+          (curPoint.open - curPoint.low) < ((curPoint.high - curPoint.close))) {
+        chartPaint.color = this.chartColors.stockKDSell;
+        path.moveTo(curX - 5, high - 25);
+        path.lineTo(curX, high - 15);
+        path.lineTo(curX + 5, high - 25);
+        path.close();
+        canvas.drawPath(path, chartPaint);
       }
-
       // BUY
-      if((curPoint.open-curPoint.low)>((curPoint.high-curPoint.close))){
-        chartPaint.color = Colors.blue;
-        canvas.drawRect(
-              Rect.fromLTRB(curX - lineR, low+20, curX + lineR, low+10), chartPaint);
+      if (curPoint.stochastic_kd_flag == "LONG" &&
+          (curPoint.open - curPoint.low) > ((curPoint.high - curPoint.close))) {
+        chartPaint.color = this.chartColors.stochKDBuy;
+        path.moveTo(curX - 5, low + 25);
+        path.lineTo(curX, low + 15);
+        path.lineTo(curX + 5, low + 25);
+        path.close();
+        canvas.drawPath(path, chartPaint);
       }
-
-
     } else if (close > open) {
       // SELL
-      if((curPoint.open-curPoint.low)<((curPoint.high-curPoint.close))){
-        chartPaint.color = Colors.red;
-        canvas.drawRect(
-              Rect.fromLTRB(curX - lineR, high-20, curX + lineR, high-10), chartPaint);
+      if (curPoint.stochastic_kd_flag == "SHORT" &&
+          (curPoint.open - curPoint.low) < ((curPoint.high - curPoint.close))) {
+        chartPaint.color = this.chartColors.stockKDSell;
+        path.moveTo(curX - 5, high - 25);
+        path.lineTo(curX, high - 15);
+        path.lineTo(curX + 5, high - 25);
+        path.close();
+        canvas.drawPath(path, chartPaint);
       }
-
       // BUY
-      if((curPoint.open-curPoint.low)>((curPoint.high-curPoint.close))){
-      chartPaint.color = Colors.blue;
-      canvas.drawRect(
-            Rect.fromLTRB(curX - lineR, low+20, curX + lineR, low+10), chartPaint);
+      if (curPoint.stochastic_kd_flag == "LONG" &&
+          (curPoint.open - curPoint.low) > ((curPoint.high - curPoint.close))) {
+        chartPaint.color = this.chartColors.stochKDBuy;
+        path.moveTo(curX - 5, low + 15);
+        path.lineTo(curX, low + 5);
+        path.lineTo(curX + 5, low + 15);
+        path.close();
+        canvas.drawPath(path, chartPaint);
+      }
+    }
+  }
+
+  void drawRSISignal(CandleEntity curPoint, Canvas canvas, double curX) {
+    var high = getY(curPoint.high);
+    var low = getY(curPoint.low);
+    var open = getY(curPoint.open);
+    var close = getY(curPoint.close);
+    var path = Path();
+    double r = mCandleWidth / 2;
+    double lineR = mCandleLineWidth / 2;
+    if (open >= close) {
+      // SELL
+      if (curPoint.rsi_flag == "SHORT" &&
+          (curPoint.open - curPoint.low) < ((curPoint.high - curPoint.close))) {
+        chartPaint.color = this.chartColors.rsiSell;
+        path.moveTo(curX - 5, high - 20);
+        path.lineTo(curX, high);
+        path.lineTo(curX + 5, high - 20);
+        path.close();
+        canvas.drawPath(path, chartPaint);
+      }
+      // BUY
+      if (curPoint.rsi_flag == "LONG" &&
+          (curPoint.open - curPoint.low) > ((curPoint.high - curPoint.close))) {
+        chartPaint.color = this.chartColors.rsiBuy;
+        path.moveTo(curX - 5, low + 15);
+        path.lineTo(curX, low + 5);
+        path.lineTo(curX + 5, low + 15);
+        path.close();
+        canvas.drawPath(path, chartPaint);
+      }
+    } else if (close > open) {
+      // SELL
+      if (curPoint.rsi_flag == "SHORT" &&
+          (curPoint.open - curPoint.low) < ((curPoint.high - curPoint.close))) {
+        chartPaint.color = this.chartColors.rsiSell;
+        path.moveTo(curX - 5, high - 15);
+        path.lineTo(curX, high - 5);
+        path.lineTo(curX + 5, high - 15);
+        path.close();
+        canvas.drawPath(path, chartPaint);
+      }
+      // BUY
+      if (curPoint.rsi_flag == "LONG" &&
+          (curPoint.open - curPoint.low) > ((curPoint.high - curPoint.close))) {
+        chartPaint.color = this.chartColors.rsiBuy;
+        path.moveTo(curX - 5, low + 15);
+        path.lineTo(curX, low + 5);
+        path.lineTo(curX + 5, low + 15);
+        path.close();
+        canvas.drawPath(path, chartPaint);
       }
     }
   }
@@ -271,22 +382,20 @@ class MainRenderer extends BaseChartRenderer<CandleEntity> {
     var low = getY(curPoint.low);
     var open = getY(curPoint.open);
     var close = getY(curPoint.close);
-    double r = mCandleWidth / 2;
+    double r = mCandleWidth / 1.8;
     double lineR = mCandleLineWidth / 2;
     if (open >= close) {
-
+      // 实体高度>= CandleLineWidth
       if (open - close < mCandleLineWidth) {
         open = close + mCandleLineWidth;
       }
-      
       chartPaint.color = this.chartColors.upColor;
       canvas.drawRect(
           Rect.fromLTRB(curX - r, close, curX + r, open), chartPaint);
       canvas.drawRect(
           Rect.fromLTRB(curX - lineR, high, curX + lineR, low), chartPaint);
-
     } else if (close > open) {
-
+      // 实体高度>= CandleLineWidth
       if (close - open < mCandleLineWidth) {
         open = close - mCandleLineWidth;
       }

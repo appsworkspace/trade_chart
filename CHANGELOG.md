@@ -17,3 +17,31 @@
 ## [0.1.4]
 
 * Add MA High, MA Low, Fix RSI(14,9)
+
+## [0.1.5]
+
+* Add MAC, StochasticKD Signal, RSI Signal
+
+## [0.1.6]
+
+* Fix Bugs
+
+## [0.1.7]
+
+* Add TBox, BBox, MA14, Fix MAC
+
+## [0.1.8]
+
+* Fix Range Chart
+
+## [0.1.9]
+
+* Fix Date Chart, Bold Line Chart
+
+## [0.1.10]
+
+* Fix Date Chart, Bold Line Chart
+
+## [0.1.11]
+
+* Change Parameter
