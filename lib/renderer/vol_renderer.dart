@@ -82,12 +82,33 @@ class VolRenderer extends BaseChartRenderer<VolumeEntity> {
 
   @override
   void drawRightText(canvas, textStyle, int gridRows) {
-    // TextSpan span =
-    //     TextSpan(text: "${NumberUtil.format(maxValue)}", style: textStyle);
-    // TextPainter tp = TextPainter(text: span, textDirection: TextDirection.ltr);
-    // tp.layout();
-    // tp.paint(canvas,
-    //     Offset(chartRect.width - tp.width, chartRect.top - topPadding + 10));
+    TextSpan span = TextSpan(
+        text: "${NumberUtil.formatNumber(maxValue)}", style: textStyle);
+    TextPainter tp = TextPainter(text: span, textDirection: TextDirection.ltr);
+    tp.layout();
+    tp.paint(
+        canvas, Offset(chartRect.width - tp.width, chartRect.top - topPadding+5));
+    TextSpan span2 = TextSpan(
+        text: "${NumberUtil.formatNumber(maxValue / 2)}", style: textStyle);
+    TextPainter tp2 =
+        TextPainter(text: span2, textDirection: TextDirection.ltr);
+    tp2.layout();
+    tp2.paint(
+        canvas,
+        Offset(chartRect.width - tp2.width,
+            chartRect.top - topPadding + ((chartRect.width - tp2.width) * .2)));
+    TextSpan span3 = TextSpan(text: "0", style: textStyle);
+    TextPainter tp3 =
+        TextPainter(text: span3, textDirection: TextDirection.ltr);
+    tp3.layout();
+    tp3.paint(
+        canvas,
+        Offset(
+            chartRect.width - tp3.width,
+            chartRect.top -
+                topPadding +
+                ((chartRect.width - tp3.width) * .4) -
+                25));
   }
 
   @override

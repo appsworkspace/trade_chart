@@ -16,7 +16,7 @@ class NumberUtil {
   }
 
   static String formatNumber(double n) {
-    var formatter = NumberFormat('#,##0.####');
+    var formatter = NumberFormat('#,##0');
     var res = formatter.format(n);
     return "${res}";
   }

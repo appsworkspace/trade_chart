@@ -45,3 +45,7 @@
 ## [0.1.11]
 
 * Change Parameter
+
+## [0.1.12]
+
+* Fix Format Number
