@@ -114,7 +114,7 @@ class ChartPainter extends BaseChartPainter {
     Gradient mBgGradient = LinearGradient(
       begin: Alignment.bottomCenter,
       end: Alignment.topCenter,
-      colors: bgColor ?? [Color(0xffffffff), Color(0xffffffff)],
+      colors: bgColor ?? [Colors.transparent, Colors.transparent],
     );
     Rect mainRect =
         Rect.fromLTRB(0, 0, mMainRect.width, mMainRect.height + mTopPadding);
@@ -160,13 +160,11 @@ class ChartPainter extends BaseChartPainter {
       KLineEntity lastPoint = i == 0 ? curPoint : datas![i - 1];
       double curX = getX(i);
       double lastX = i == 0 ? curX : getX(i - 1);
-
       mMainRenderer.drawChart(lastPoint, curPoint, lastX, curX, size, canvas);
       mVolRenderer?.drawChart(lastPoint, curPoint, lastX, curX, size, canvas);
       mSecondaryRenderer?.drawChart(
           lastPoint, curPoint, lastX, curX, size, canvas);
     }
-
     if (isLongPress == true) drawCrossLine(canvas, size);
     canvas.restore();
   }
@@ -195,17 +193,6 @@ class ChartPainter extends BaseChartPainter {
         tp.paint(canvas, Offset(columnSpace * i - tp.width / 2 + 50, y));
       }
     }
-
-//    double translateX = xToTranslateX(0);
-//    if (translateX >= startX && translateX <= stopX) {
-//      TextPainter tp = getTextPainter(getDate(datas[mStartIndex].id));
-//      tp.paint(canvas, Offset(0, y));
-//    }
-//    translateX = xToTranslateX(size.width);
-//    if (translateX >= startX && translateX <= stopX) {
-//      TextPainter tp = getTextPainter(getDate(datas[mStopIndex].id));
-//      tp.paint(canvas, Offset(size.width - tp.width, y));
-//    }
   }
 
   @override
@@ -274,18 +261,15 @@ class ChartPainter extends BaseChartPainter {
         selectorBorderPaint);
 
     dateTp.paint(canvas, Offset(x - textWidth / 2, y));
-    //长按显示这条数据详情
     sink?.add(InfoWindowEntity(point, isLeft: isLeft));
   }
 
   @override
   void drawText(Canvas canvas, KLineEntity data, double x) {
-    //长按显示按中的数据
     if (isLongPress) {
       var index = calculateSelectedX(selectX);
       data = getItem(index);
     }
-    //松开显示最后一条数据
     mMainRenderer.drawText(canvas, data, x);
     mVolRenderer?.drawText(canvas, data, x);
     mSecondaryRenderer?.drawText(canvas, data, x);
@@ -294,11 +278,9 @@ class ChartPainter extends BaseChartPainter {
   @override
   void drawMaxAndMin(Canvas canvas) {
     if (isLine == true) return;
-    //绘制最大值和最小值
     double x = translateXtoX(getX(mMainMinIndex));
     double y = getMainY(mMainLowMinValue);
     if (x < mWidth / 2) {
-      //画右边
       TextPainter tp = getTextPainter(
           "──────── " +
               NumberUtil.formatNumber(
@@ -318,18 +300,18 @@ class ChartPainter extends BaseChartPainter {
     if (x < mWidth / 2) {
       //画右边
       TextPainter tp = getTextPainter(
-          "── " +
+          "──────── " +
               NumberUtil.formatNumber(
                   double.parse(mMainHighMaxValue.toStringAsFixed(0))),
           chartColors.maxColor);
-      tp.paint(canvas, Offset(x-50, y - tp.height / 2));
+      tp.paint(canvas, Offset(x - 50, y - tp.height / 2));
     } else {
       TextPainter tp = getTextPainter(
           NumberUtil.formatNumber(
                   double.parse(mMainHighMaxValue.toStringAsFixed(0))) +
-              " ──",
+              " ────────",
           chartColors.maxColor);
-      tp.paint(canvas, Offset(x - tp.width-50, y - tp.height / 2));
+      tp.paint(canvas, Offset(x - tp.width - 50, y - tp.height / 2));
     }
   }
 

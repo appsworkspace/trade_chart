@@ -32,8 +32,8 @@ class VolRenderer extends BaseChartRenderer<VolumeEntity> {
           Rect.fromLTRB(curX - r, top, curX + r, bottom),
           chartPaint
             ..color = curPoint.close > curPoint.open
-                ? this.chartColors.upColor.withOpacity(.1)
-                : this.chartColors.dnColor.withOpacity(.1));
+                ? this.chartColors.upColor
+                : this.chartColors.dnColor);
     }
 
     // if (lastPoint.MA5Volume != 0) {
@@ -86,29 +86,8 @@ class VolRenderer extends BaseChartRenderer<VolumeEntity> {
         text: "${NumberUtil.formatNumber(maxValue)}", style: textStyle);
     TextPainter tp = TextPainter(text: span, textDirection: TextDirection.ltr);
     tp.layout();
-    tp.paint(
-        canvas, Offset(chartRect.width - tp.width, chartRect.top - topPadding+5));
-    TextSpan span2 = TextSpan(
-        text: "${NumberUtil.formatNumber(maxValue / 2)}", style: textStyle);
-    TextPainter tp2 =
-        TextPainter(text: span2, textDirection: TextDirection.ltr);
-    tp2.layout();
-    tp2.paint(
-        canvas,
-        Offset(chartRect.width - tp2.width,
-            chartRect.top - topPadding + ((chartRect.width - tp2.width) * .2)));
-    TextSpan span3 = TextSpan(text: "0", style: textStyle);
-    TextPainter tp3 =
-        TextPainter(text: span3, textDirection: TextDirection.ltr);
-    tp3.layout();
-    tp3.paint(
-        canvas,
-        Offset(
-            chartRect.width - tp3.width,
-            chartRect.top -
-                topPadding +
-                ((chartRect.width - tp3.width) * .4) -
-                25));
+    tp.paint(canvas,
+        Offset(chartRect.width - tp.width, chartRect.top - topPadding + 5));
   }
 
   @override

@@ -49,3 +49,11 @@
 ## [0.1.12]
 
 * Fix Format Number
+
+## [0.1.13]
+
+* Adjust Volume
+
+## [0.1.14]
+
+* Adjust Volume

@@ -19,6 +19,10 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.green,
       ),
+      darkTheme: ThemeData(
+        brightness: Brightness.dark,
+      ),
+      themeMode: ThemeMode.system,
       home: MyHomePage(title: 'Flutter Demo Home Page'),
     );
   }
@@ -51,6 +55,26 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   void initState() {
+    chartColors.minColor = Colors.grey;
+    chartColors.maxColor = Colors.grey;
+    chartColors.nowPriceUpColor = Colors.yellow;
+    chartColors.nowPriceDnColor = Colors.yellow;
+    chartColors.nowPriceTextColor = Colors.black;
+    chartColors.gridColor = Colors.black54;
+    chartColors.dnColor = Colors.red;
+    chartColors.upColor = Colors.green;
+    chartColors.defaultTextColor = Colors.white;
+    chartColors.selectFillColor = Colors.grey.withOpacity(1);
+    chartColors.crossTextColor = Colors.black;
+    chartColors.hCrossColor = Colors.grey;
+    chartColors.vCrossColor = Colors.grey;
+    chartColors.selectBorderColor = Colors.black;
+    chartColors.infoWindowNormalColor = Colors.black;
+    chartColors.infoWindowTitleColor = Colors.black;
+    chartStyle.candleLineWidth = 2;
+    chartStyle.nowPriceLineWidth = 1;
+    chartStyle.volWidth = 6;
+
     super.initState();
     getData('1day');
     rootBundle.loadString('assets/depth.json').then((result) {
@@ -102,7 +126,7 @@ class _MyHomePageState extends State<MyHomePage> {
             chartStyle,
             chartColors,
             isLine: false,
-            mainState: MainState.MAC,
+            mainState: MainState.BOLL,
             volHidden: false,
             secondaryState: SecondaryState.NONE,
             fixedLength: 2,
@@ -110,6 +134,7 @@ class _MyHomePageState extends State<MyHomePage> {
             translations: kChartTranslations,
             isChinese: false,
             hideGrid: false,
+            bgColor: [Colors.transparent, Colors.transparent],
           ),
         ),
       ),

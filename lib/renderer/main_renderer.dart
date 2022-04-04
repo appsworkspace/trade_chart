@@ -99,11 +99,11 @@ class MainRenderer extends BaseChartRenderer<CandleEntity> {
               style: getTextStyle2(this.chartColors.BBoxColor)),
         if (data.moving_average != 0)
           TextSpan(
-              text: "MA(14) (${format(data.moving_average)})  ",
+              text: "Lautan (${format(data.moving_average)})  ",
               style: getTextStyle2(this.chartColors.ma20Color)),
         if (data.mac_high != 0)
           TextSpan(
-              text: "MACHigh(5) (${format(data.mac_high)})  ",
+              text: "Magenta (${format(data.mac_high)})  ",
               style: getTextStyle2(this.chartColors.maHighColor)),
       ]);
       span2 = TextSpan(

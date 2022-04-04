@@ -1,6 +1,6 @@
 name: trade_chart
 description: Trade Chart is specifically used by PT. Mirae Asset Sekuritas Indonesia.
-version: 0.1.12
+version: 0.1.15
 homepage: https://github.com/appsworkspace/trade_chart
 
 environment:
