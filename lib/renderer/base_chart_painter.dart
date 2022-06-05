@@ -84,7 +84,7 @@ abstract class BaseChartPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     canvas.clipRect(Rect.fromLTRB(0, 0, size.width, size.height));
     mDisplayHeight = size.height - mTopPadding - mBottomPadding;
-    mWidth = size.width;
+    mWidth = size.width-50;
     initRect(size);
     calculateValue();
     initChartRenderer();

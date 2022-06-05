@@ -152,7 +152,7 @@ class ChartPainter extends BaseChartPainter {
   @override
   void drawChart(Canvas canvas, Size size) {
     canvas.save();
-    canvas.translate(mTranslateX * scaleX - 50, 0.0);
+    canvas.translate(mTranslateX * scaleX, 0.0);
     canvas.scale(scaleX, 1.0);
     for (int i = mStartIndex; datas != null && i <= mStopIndex; i++) {
       KLineEntity? curPoint = datas?[i];
@@ -173,7 +173,7 @@ class ChartPainter extends BaseChartPainter {
   void drawRightText(canvas) {
     var textStyle = getTextStyle(this.chartColors.defaultTextColor);
     mMainRenderer.drawRightText(canvas, textStyle, mGridRows);
-    mVolRenderer?.drawRightText(canvas, textStyle, mGridRows);
+    // mVolRenderer?.drawRightText(canvas, textStyle, mGridRows);
     mSecondaryRenderer?.drawRightText(canvas, textStyle, mGridRows);
   }
 

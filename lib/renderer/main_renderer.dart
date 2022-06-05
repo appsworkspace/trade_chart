@@ -417,11 +417,11 @@ class MainRenderer extends BaseChartRenderer<CandleEntity> {
           TextPainter(text: span, textDirection: TextDirection.ltr);
       tp.layout();
       if (i == 0) {
-        tp.paint(canvas, Offset(chartRect.width - tp.width, topPadding));
+        tp.paint(canvas, Offset(chartRect.width - tp.width + 48, topPadding));
       } else {
         tp.paint(
             canvas,
-            Offset(chartRect.width - tp.width,
+            Offset(chartRect.width - tp.width + 48,
                 rowSpace * i - tp.height + topPadding));
       }
     }

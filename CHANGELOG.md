@@ -57,3 +57,11 @@
 ## [0.1.14]
 
 * Adjust Volume
+
+## [0.1.15]
+
+* Change Style
+
+## [0.1.16]
+
+* Fix Candle Chart

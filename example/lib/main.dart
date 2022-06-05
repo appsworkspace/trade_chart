@@ -74,6 +74,7 @@ class _MyHomePageState extends State<MyHomePage> {
     chartStyle.candleLineWidth = 2;
     chartStyle.nowPriceLineWidth = 1;
     chartStyle.volWidth = 6;
+    chartColors.defaultTextColor = Colors.black;
 
     super.initState();
     getData('1day');
@@ -162,7 +163,8 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<String> getIPAddress(String? period) async {
-    var url = 'https://api.andalasian.com/api/crypto/ETHUSDT';
+    var url =
+        'https://api.huobi.br.com/market/history/kline?period=1day&size=300&symbol=btcusdt';
     late String result;
     final _http = _certification();
     final response = await _http.get(Uri.parse(url));
